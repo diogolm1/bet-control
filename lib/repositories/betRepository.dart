@@ -13,7 +13,7 @@ class BetRepository {
 
   Future<Bet> insert(Bet bet) async {
     final db = await DatabaseHelper.instance.database;
-    bet.date = DateTime.now();
+    bet.date = DateTime.now().toLocal();
     if (bet.profit > bet.value) {
       bet.win = true;
     } else {
@@ -28,8 +28,14 @@ class BetRepository {
   Future<List<Bet>> getAll() async {
     final db = await DatabaseHelper.instance.database;
     var results = await db.query(BetTable.name);
-
-    return results.map((e) => Bet.fromMap(e)).toList();
+    var list = results.map((e) => Bet.fromMap(e)).toList();
+    var today = DateTime.now().toLocal();
+    return list
+        .where((element) =>
+            element.date.day == today.day &&
+            element.date.month == today.month &&
+            element.date.year == today.year)
+        .toList();
   }
 
   Future<Bet> getById(int id) async {
@@ -57,8 +63,13 @@ class BetRepository {
 
   Future<int> delete(int id) async {
     final db = await DatabaseHelper.instance.database;
-    return await db.delete(BetTable.name,
+    var bet = await getById(id);
+    await db.delete(BetTable.name,
         where: "${BetTable.columnId} = ?", whereArgs: [id]);
+
+    await BalanceRepository.instance.updateOnDeleteBet(bet.value - bet.profit);
+
+    return id;
   }
 
   Future<int> update(Bet bet) async {

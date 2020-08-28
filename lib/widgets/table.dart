@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:learning/models/bet.dart';
 import 'package:learning/repositories/betRepository.dart';
-import 'package:learning/views/betPage.dart';
 
 class BetTable extends StatefulWidget {
   @override
   BetTableState createState() => BetTableState();
 
   final selectRowCallback onSelectRow;
+  final excludeRowCallback onExcludeRow;
 
-  BetTable({this.onSelectRow});
+  BetTable({this.onSelectRow, this.onExcludeRow});
 }
 
 typedef selectRowCallback = void Function({Bet bet});
+typedef excludeRowCallback = void Function();
 
 class BetTableState extends State<BetTable> {
   Future<List<Bet>> getBets() async {
@@ -20,6 +22,8 @@ class BetTableState extends State<BetTable> {
 
     return bets;
   }
+
+  var formatCurrency = NumberFormat("#,##0.00", "pt");
 
   Future _deleteConfirmation(int id) async {
     showDialog(
@@ -49,9 +53,7 @@ class BetTableState extends State<BetTable> {
 
   void _deleteBet(int id) async {
     await BetRepository.instance.delete(id);
-    setState(() {
-      getBets();
-    });
+    widget.onExcludeRow();
   }
 
   void _showOptions(BuildContext context, Bet bet) {
@@ -97,50 +99,64 @@ class BetTableState extends State<BetTable> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.only(top: 20),
-        child: SingleChildScrollView(
-          child: FutureBuilder(
-              future: getBets(),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                    return Center(
-                      child: Text("Carregando dados..."),
-                    );
-                  default:
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text("Erro ao carregar dados"),
-                      );
-                    } else {
-                      return DataTable(
-                        showCheckboxColumn: false,
-                        columns: <DataColumn>[
-                          DataColumn(label: Text("Nome")),
-                          DataColumn(label: Text("Valor")),
-                          DataColumn(label: Text("Odd")),
-                          DataColumn(label: Text("Lucro/Prejuízo"))
-                        ],
-                        rows: List<DataRow>.from(snapshot.data
-                            .map((e) => new DataRow(
-                                    cells: <DataCell>[
-                                      DataCell(Text(e.name)),
-                                      DataCell(
-                                          Text(e.value.toStringAsFixed(2))),
-                                      DataCell(Text(e.odd.toString())),
-                                      DataCell(Text((e.profit - e.value)
-                                          .toStringAsFixed(2)))
-                                    ],
-                                    onSelectChanged: (bool selected) {
-                                      _showOptions(context, e);
-                                    }))
-                            .toList()),
-                      );
-                    }
+      margin: EdgeInsets.only(top: 20),
+      child: FutureBuilder(
+          future: getBets(),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+                return Center(
+                  child: Text("Carregando dados..."),
+                );
+              default:
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text("Erro ao carregar dados"),
+                  );
+                } else {
+                  return DataTable(
+                    showCheckboxColumn: false,
+                    columns: <DataColumn>[
+                      DataColumn(
+                          label: Text(
+                        "Nome",
+                        textAlign: TextAlign.center,
+                      )),
+                      DataColumn(label: Text("Valor")),
+                      DataColumn(label: Text("Odd")),
+                      DataColumn(
+                          label: Text(
+                        "Lucro/Prejuízo",
+                        textAlign: TextAlign.start,
+                      ))
+                    ],
+                    rows: List<DataRow>.from(snapshot.data
+                        .map((e) => new DataRow(
+                                cells: <DataCell>[
+                                  DataCell(Text(e.name)),
+                                  DataCell(
+                                      Text(formatCurrency.format(e.value))),
+                                  DataCell(Text(e.odd.toString())),
+                                  DataCell(Text(formatCurrency
+                                      .format(e.profit - e.value)))
+                                ],
+                                onSelectChanged: (bool selected) {
+                                  _showOptions(context, e);
+                                },
+                                color:
+                                    MaterialStateProperty.resolveWith((states) {
+                                  if ((e.profit - e.value) < 0) {
+                                    return Color.fromRGBO(223, 0, 1, 0.4);
+                                  } else {
+                                    return Color.fromRGBO(0, 210, 14, 0.3);
+                                  }
+                                })))
+                        .toList()),
+                  );
                 }
-              }),
-          scrollDirection: Axis.horizontal,
-        ));
+            }
+          }),
+    );
   }
 }

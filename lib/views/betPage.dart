@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:learning/models/bet.dart';
 
 class BetPage extends StatefulWidget {
@@ -10,17 +11,17 @@ class BetPage extends StatefulWidget {
   _BetPageState createState() => _BetPageState();
 }
 
-enum BetResultType { win, lose, cashout }
-
 class _BetPageState extends State<BetPage> {
   bool _userEdited = false;
 
   Bet _editedBet;
 
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   final _nameCtr = TextEditingController();
-  final _valueCtr = TextEditingController();
-  final _oddCtr = TextEditingController();
-  final _profitCtr = TextEditingController();
+  final _valueCtr = MoneyMaskedTextController(precision: 2);
+  final _oddCtr = MoneyMaskedTextController(precision: 2);
+  final _profitCtr = MoneyMaskedTextController(precision: 2);
   final _descriptionCtr = TextEditingController();
 
   @override
@@ -32,14 +33,17 @@ class _BetPageState extends State<BetPage> {
     } else {
       _editedBet = Bet.fromMap(widget.bet.toMap());
       _nameCtr.text = _editedBet.name;
-      _valueCtr.text = _editedBet.value.toString();
-      _oddCtr.text = _editedBet.odd.toString();
-      _profitCtr.text = _editedBet.profit.toString();
+      _valueCtr.updateValue(_editedBet.value);
+      _oddCtr.updateValue(_editedBet.odd);
+      _profitCtr.updateValue(_editedBet.profit);
       _descriptionCtr.text = _editedBet.description;
     }
   }
 
   void _saveBet() {
+    _editedBet.value = _valueCtr.numberValue;
+    _editedBet.odd = _oddCtr.numberValue;
+    _editedBet.profit = _profitCtr.numberValue;
     Navigator.pop(context, _editedBet);
   }
 
@@ -89,82 +93,105 @@ class _BetPageState extends State<BetPage> {
           child: Container(
               margin: EdgeInsets.fromLTRB(20, 5, 20, 20),
               child: Container(
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _nameCtr,
-                      decoration: InputDecoration(labelText: "Nome"),
-                      onChanged: (text) {
-                        _userEdited = true;
-                        setState(() {
-                          _editedBet.name = text;
-                        });
-                      },
-                    ),
-                    TextFormField(
-                      controller: _valueCtr,
-                      decoration: InputDecoration(labelText: "Valor"),
-                      keyboardType: TextInputType.number,
-                      onChanged: (text) {
-                        _userEdited = true;
-                        setState(() {
-                          _editedBet.value = double.parse(text);
-                        });
-                      },
-                    ),
-                    TextFormField(
-                      controller: _oddCtr,
-                      decoration: InputDecoration(labelText: "Odd"),
-                      keyboardType: TextInputType.number,
-                      onChanged: (text) {
-                        _userEdited = true;
-                        setState(() {
-                          _editedBet.odd = double.parse(text);
-                        });
-                      },
-                    ),
-                    TextFormField(
-                      controller: _profitCtr,
-                      decoration: InputDecoration(labelText: "Retorno obtido"),
-                      keyboardType: TextInputType.number,
-                      onChanged: (text) {
-                        _userEdited = true;
-                        setState(() {
-                          _editedBet.profit = double.parse(text);
-                        });
-                      },
-                    ),
-                    TextFormField(
-                      controller: _descriptionCtr,
-                      decoration: InputDecoration(labelText: "Descrição"),
-                      onChanged: (text) {
-                        _userEdited = true;
-                        setState(() {
-                          _editedBet.description = text;
-                        });
-                      },
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 25),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: RaisedButton(
-                              onPressed: _saveBet,
-                              color: Colors.green,
-                              textColor: Colors.white,
-                              child: Text(
-                                "Salvar",
-                                style: TextStyle(fontSize: 20),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _nameCtr,
+                        validator: (value) {
+                          if (value.isEmpty || value == null) {
+                            return "Insira um nome.";
+                          }
+                        },
+                        decoration: InputDecoration(labelText: "Nome"),
+                        onChanged: (text) {
+                          _userEdited = true;
+                          setState(() {
+                            _editedBet.name = text;
+                          });
+                        },
+                      ),
+                      TextFormField(
+                        controller: _valueCtr,
+                        validator: (value) {
+                          if (_valueCtr.numberValue == 0) {
+                            return "Valor apostado não pode ser 0.";
+                          }
+                        },
+                        decoration: InputDecoration(labelText: "Valor"),
+                        keyboardType: TextInputType.number,
+                        onChanged: (text) {
+                          _userEdited = true;
+                          setState(() {
+                            _editedBet.value = double.parse(text);
+                          });
+                        },
+                      ),
+                      TextFormField(
+                        controller: _oddCtr,
+                        validator: (value) {
+                          if (_oddCtr.numberValue == 0) {
+                            return "Odd não pode ser 0.";
+                          }
+                        },
+                        decoration: InputDecoration(labelText: "Odd"),
+                        keyboardType: TextInputType.number,
+                        onChanged: (text) {
+                          _userEdited = true;
+                          setState(() {
+                            _editedBet.odd = double.parse(text);
+                          });
+                        },
+                      ),
+                      TextFormField(
+                        controller: _profitCtr,
+                        decoration:
+                            InputDecoration(labelText: "Retorno obtido"),
+                        keyboardType: TextInputType.number,
+                        onChanged: (text) {
+                          _userEdited = true;
+                          setState(() {
+                            _editedBet.profit = double.parse(text);
+                          });
+                        },
+                      ),
+                      TextFormField(
+                        controller: _descriptionCtr,
+                        decoration: InputDecoration(labelText: "Descrição"),
+                        onChanged: (text) {
+                          _userEdited = true;
+                          setState(() {
+                            _editedBet.description = text;
+                          });
+                        },
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 25),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: RaisedButton(
+                                onPressed: () {
+                                  if (_formKey.currentState.validate()) {
+                                    _saveBet();
+                                  }
+                                },
+                                color: Colors.green,
+                                textColor: Colors.white,
+                                child: Text(
+                                  "Salvar",
+                                  style: TextStyle(fontSize: 20),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               )),
         ),

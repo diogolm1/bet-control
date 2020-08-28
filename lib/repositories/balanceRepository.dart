@@ -12,7 +12,7 @@ class BalanceRepository {
 
   Future<Balance> insert(balance) async {
     final db = await DatabaseHelper.instance.database;
-    balance.date = DateTime.now();
+    balance.date = DateTime.now().toLocal();
 
     balance.id = await db.insert(BalanceTable.name, balance.toMap());
     return balance;
@@ -52,8 +52,11 @@ class BalanceRepository {
     if (result.length > 0) {
       return Balance.fromMap(result.first);
     } else {
-      return await insert(
-          Balance(balance: 0, date: DateTime.now(), dayProfit: 0, dayLoss: 0));
+      return await insert(Balance(
+          balance: 0,
+          date: DateTime.now().toLocal(),
+          dayProfit: 0,
+          dayLoss: 0));
     }
   }
 
@@ -72,7 +75,7 @@ class BalanceRepository {
           balance: b.balance,
           dayProfit: profit > 0 ? profit : 0,
           dayLoss: profit < 0 ? profit : 0,
-          date: DateTime.now()));
+          date: DateTime.now().toLocal()));
       return newBalance.id;
     } else {
       b.balance += profit;
@@ -82,6 +85,25 @@ class BalanceRepository {
       return await db.update(BalanceTable.name, b.toMap(),
           where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
     }
+  }
+
+  Future updateBalance(double balance) async {
+    final db = await DatabaseHelper.instance.database;
+    var b = await getLast();
+    b.balance = balance;
+    return await db.update(BalanceTable.name, b.toMap());
+  }
+
+  Future updateOnDeleteBet(double profit) async {
+    final db = await DatabaseHelper.instance.database;
+    var b = await getLast();
+    b.balance += profit;
+    if (profit < 0) {
+      b.dayProfit += profit;
+    } else {
+      b.dayLoss += profit;
+    }
+    return await db.update(BalanceTable.name, b.toMap());
   }
 
   Future close() async {

@@ -1,4 +1,4 @@
-package com.example.learning
+package com.betcontrol.betcontrol
 
 import io.flutter.embedding.android.FlutterActivity
 
