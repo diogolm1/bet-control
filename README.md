@@ -1,6 +1,6 @@
-# learning
+# Bet control
 
-A new Flutter project.
+App para controle de apostas usando o framework flutter.
 
 ## Getting Started
 
