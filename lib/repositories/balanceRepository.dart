@@ -50,13 +50,25 @@ class BalanceRepository {
     var result = await db.rawQuery(
         "SELECT * FROM ${BalanceTable.name} ORDER BY ${BalanceTable.columnId} DESC LIMIT 1");
     if (result.length > 0) {
-      return Balance.fromMap(result.first);
+      return await _returnUpdatedBalance(Balance.fromMap(result.first));
     } else {
       return await insert(Balance(
           balance: 0,
           date: DateTime.now().toLocal(),
           dayProfit: 0,
           dayLoss: 0));
+    }
+  }
+
+  Future<Balance> _returnUpdatedBalance(Balance b) async {
+    final today = DateTime.now().toLocal();
+    if (b.date.day == today.day &&
+        b.date.month == today.month &&
+        b.date.year == today.year) {
+      return b;
+    } else {
+      return await insert(
+          Balance(balance: b.balance, date: today, dayLoss: 0, dayProfit: 0));
     }
   }
 
