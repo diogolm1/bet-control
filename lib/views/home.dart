@@ -277,11 +277,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                           ),
                                         ),
                                       ),
-
-                                      //     Text(
-                                      //   "Resultado do dia: R\$ ${snapshot.data.dayProfit + snapshot.data.dayLoss}",
-                                      //   textAlign: TextAlign.center,
-                                      // ),
                                     ],
                                   ))
                             ],
