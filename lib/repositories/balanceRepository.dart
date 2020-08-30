@@ -103,7 +103,8 @@ class BalanceRepository {
     final db = await DatabaseHelper.instance.database;
     var b = await getLast();
     b.balance = balance;
-    return await db.update(BalanceTable.name, b.toMap());
+    return await db.update(BalanceTable.name, b.toMap(),
+        where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
   }
 
   Future updateOnDeleteBet(double profit) async {

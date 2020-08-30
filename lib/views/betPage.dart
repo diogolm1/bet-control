@@ -97,45 +97,64 @@ class _BetPageState extends State<BetPage> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      TextFormField(
-                        controller: _nameCtr,
-                        validator: (value) {
-                          if (value.isEmpty || value == null) {
-                            return "Insira um nome.";
-                          }
-                        },
-                        decoration: InputDecoration(labelText: "Nome"),
-                        onChanged: (text) {
-                          _userEdited = true;
-                          setState(() {
-                            _editedBet.name = text;
-                          });
-                        },
+                      Container(
+                        child: TextFormField(
+                          controller: _nameCtr,
+                          validator: (value) {
+                            if (value.isEmpty || value == null) {
+                              return "Insira um nome.";
+                            }
+                          },
+                          style: TextStyle(fontSize: 20),
+                          decoration: InputDecoration(
+                            labelText: "Nome",
+                            contentPadding: EdgeInsets.only(bottom: 5, top: 10),
+                          ),
+                          textAlignVertical: TextAlignVertical.bottom,
+                          textCapitalization: TextCapitalization.sentences,
+                          onChanged: (text) {
+                            _userEdited = true;
+                            setState(() {
+                              _editedBet.name = text;
+                            });
+                          },
+                        ),
                       ),
-                      TextFormField(
-                        controller: _valueCtr,
-                        validator: (value) {
-                          if (_valueCtr.numberValue == 0) {
-                            return "Valor apostado não pode ser 0.";
-                          }
-                        },
-                        decoration: InputDecoration(labelText: "Valor"),
-                        keyboardType: TextInputType.number,
-                        onChanged: (text) {
-                          _userEdited = true;
-                          setState(() {
-                            _editedBet.value = double.parse(text);
-                          });
-                        },
+                      Container(
+                        child: TextFormField(
+                          controller: _valueCtr,
+                          validator: (value) {
+                            if (_valueCtr.numberValue == 0) {
+                              return "Valor apostado não pode ser 0.";
+                            }
+                          },
+                          style: TextStyle(fontSize: 20),
+                          decoration: InputDecoration(
+                            labelText: "Valor",
+                            contentPadding: EdgeInsets.only(bottom: 5, top: 10),
+                          ),
+                          keyboardType: TextInputType.number,
+                          onChanged: (text) {
+                            _userEdited = true;
+                            setState(() {
+                              _editedBet.value = double.parse(text);
+                            });
+                          },
+                        ),
                       ),
-                      TextFormField(
+                      Container(
+                          child: TextFormField(
                         controller: _oddCtr,
                         validator: (value) {
                           if (_oddCtr.numberValue == 0) {
                             return "Odd não pode ser 0.";
                           }
                         },
-                        decoration: InputDecoration(labelText: "Odd"),
+                        style: TextStyle(fontSize: 20),
+                        decoration: InputDecoration(
+                          labelText: "Odd",
+                          contentPadding: EdgeInsets.only(bottom: 5, top: 10),
+                        ),
                         keyboardType: TextInputType.number,
                         onChanged: (text) {
                           _userEdited = true;
@@ -143,11 +162,15 @@ class _BetPageState extends State<BetPage> {
                             _editedBet.odd = double.parse(text);
                           });
                         },
-                      ),
-                      TextFormField(
+                      )),
+                      Container(
+                          child: TextFormField(
                         controller: _profitCtr,
-                        decoration:
-                            InputDecoration(labelText: "Retorno obtido"),
+                        style: TextStyle(fontSize: 20),
+                        decoration: InputDecoration(
+                          labelText: "Retorno obtido",
+                          contentPadding: EdgeInsets.only(bottom: 5, top: 10),
+                        ),
                         keyboardType: TextInputType.number,
                         onChanged: (text) {
                           _userEdited = true;
@@ -155,16 +178,23 @@ class _BetPageState extends State<BetPage> {
                             _editedBet.profit = double.parse(text);
                           });
                         },
-                      ),
-                      TextFormField(
-                        controller: _descriptionCtr,
-                        decoration: InputDecoration(labelText: "Descrição"),
-                        onChanged: (text) {
-                          _userEdited = true;
-                          setState(() {
-                            _editedBet.description = text;
-                          });
-                        },
+                      )),
+                      Container(
+                        child: TextFormField(
+                          controller: _descriptionCtr,
+                          style: TextStyle(fontSize: 20),
+                          decoration: InputDecoration(
+                            labelText: "Descrição",
+                            contentPadding: EdgeInsets.only(bottom: 5, top: 10),
+                          ),
+                          textCapitalization: TextCapitalization.sentences,
+                          onChanged: (text) {
+                            _userEdited = true;
+                            setState(() {
+                              _editedBet.description = text;
+                            });
+                          },
+                        ),
                       ),
                       Container(
                         margin: EdgeInsets.only(top: 25),

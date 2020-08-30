@@ -15,6 +15,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      darkTheme:
+          ThemeData(primarySwatch: Colors.green, primaryColor: Colors.black),
       debugShowCheckedModeBanner: false,
       home: MyHomePage(title: 'Anote sua aposta'),
     );
