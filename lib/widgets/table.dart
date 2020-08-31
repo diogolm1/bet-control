@@ -122,13 +122,23 @@ class BetTableState extends State<BetTable> {
                           label: Text(
                         "Nome",
                         textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
                       )),
-                      DataColumn(label: Text("Valor")),
-                      DataColumn(label: Text("Odd")),
+                      DataColumn(
+                          label: Text(
+                        "Valor",
+                        style: TextStyle(color: Colors.white),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        "Odd",
+                        style: TextStyle(color: Colors.white),
+                      )),
                       DataColumn(
                           label: Text(
                         "Lucro/Prejuízo",
                         textAlign: TextAlign.start,
+                        style: TextStyle(color: Colors.white),
                       ))
                     ],
                     rows: List<DataRow>.from(snapshot.data

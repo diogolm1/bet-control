@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:learning/database/database.dart';
 import 'package:learning/database/tables/balanceTable.dart';
 import 'package:learning/models/balance.dart';
+import 'package:learning/models/balancePerDay.dart';
 
 class BalanceRepository {
   static final BalanceRepository instance = BalanceRepository.internal();
@@ -122,5 +123,25 @@ class BalanceRepository {
   Future close() async {
     final db = await DatabaseHelper.instance.database;
     db.close();
+  }
+
+  Future<List<BalancePerDay>> getBalancePerDay(int days) async {
+    final db = await DatabaseHelper.instance.database;
+    var balances = await db.rawQuery(
+        "SELECT * FROM ${BalanceTable.name} ORDER BY ${BalanceTable.columnId} DESC LIMIT 8");
+
+    var balancesPerDay = balances
+        .map((e) => new BalancePerDay(
+            DateTime.parse(e[BalanceTable.columnDate]),
+            e[BalanceTable.columnBalance]))
+        .toList();
+
+    while (balancesPerDay.length < 7) {
+      var last = balancesPerDay[balancesPerDay.length - 1];
+      balancesPerDay
+          .add(BalancePerDay(last.date.subtract(Duration(days: 1)), 0));
+    }
+
+    return balancesPerDay;
   }
 }

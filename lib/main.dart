@@ -12,11 +12,21 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Bet Control',
       theme: ThemeData(
-        primarySwatch: Colors.green,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      darkTheme:
-          ThemeData(primarySwatch: Colors.green, primaryColor: Colors.black),
+          textTheme: TextTheme(
+            bodyText1: TextStyle(),
+            bodyText2: TextStyle(),
+          ).apply(bodyColor: Colors.white, displayColor: Colors.white),
+          primarySwatch: Colors.green,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          backgroundColor: Color.fromRGBO(53, 51, 51, 1)),
+      darkTheme: ThemeData(
+          textTheme: TextTheme(
+            bodyText1: TextStyle(),
+            bodyText2: TextStyle(),
+          ).apply(bodyColor: Colors.white, displayColor: Colors.white),
+          primarySwatch: Colors.green,
+          primaryColor: Color.fromRGBO(53, 51, 51, 1),
+          backgroundColor: Color.fromRGBO(53, 51, 51, 1)),
       debugShowCheckedModeBanner: false,
       home: MyHomePage(title: 'Anote sua aposta'),
     );

@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:learning/models/axisTheme.dart';
 import 'package:learning/models/balance.dart';
+import 'package:learning/models/balancePerDay.dart';
 import 'package:learning/models/bet.dart';
 import 'package:learning/repositories/balanceRepository.dart';
 import 'package:learning/repositories/betRepository.dart';
 import 'package:learning/views/betPage.dart';
+import 'package:learning/widgets/balanceLineChart.dart';
 import 'package:learning/widgets/table.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -32,6 +37,10 @@ class _MyHomePageState extends State<MyHomePage> {
     var b = await BalanceRepository.instance.getLast();
     balance = b;
     return b;
+  }
+
+  Future<List<BalancePerDay>> getBalancePerDay(int days) async {
+    return await BalanceRepository.instance.getBalancePerDay(days);
   }
 
   MoneyMaskedTextController _editBalanceCtr =
@@ -105,18 +114,88 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          child: Padding(
-            padding: EdgeInsets.only(top: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                FutureBuilder(
+      // appBar: AppBar(
+      //   title: Text(widget.title),
+      //   centerTitle: true,
+      // ),
+      backgroundColor: Color.fromRGBO(53, 51, 51, 1),
+      body: Padding(
+          padding: EdgeInsets.only(top: 60),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FutureBuilder(
+                future: getBalance(),
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                      return Center(
+                        child: Text("Carregando dados..."),
+                      );
+                    default:
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text("Erro ao carregar dados."),
+                        );
+                      } else {
+                        balance = snapshot.data;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                createAlertDialog(context);
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      "Banca atual: R\$ ${formatCurrency.format(snapshot.data.balance)}",
+                                      style: GoogleFonts.patuaOne(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.w500)),
+                                  Container(
+                                    margin: EdgeInsets.only(left: 5),
+                                    child: Icon(
+                                      Icons.edit,
+                                      size: 17,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                  }
+                },
+              ),
+              // Expanded(child: Container(child: chartWidget)),
+              Container(
+                  margin: EdgeInsets.only(top: 15, bottom: 40),
+                  child: FutureBuilder(
+                      future: getBalancePerDay(7),
+                      builder: (context, snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.none:
+                          case ConnectionState.waiting:
+                            return Center(
+                              child: Text("Carregando dados..."),
+                            );
+                          default:
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Text("Erro ao carregar dados."),
+                              );
+                            } else {
+                              return BalanceLineChart(snapshot.data);
+                            }
+                        }
+                      })),
+              FutureBuilder(
                   future: getBalance(),
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
@@ -131,170 +210,72 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: Text("Erro ao carregar dados."),
                           );
                         } else {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  createAlertDialog(context);
-                                },
-                                child: Card(
-                                  color: Colors.grey,
-                                  margin: EdgeInsets.fromLTRB(100, 0, 100, 7),
-                                  child: Padding(
-                                    padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          "Banca atual",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(fontSize: 28),
-                                        ),
-                                        Padding(
-                                            padding: EdgeInsets.only(top: 5),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  "R\$ ${formatCurrency.format(snapshot.data.balance)}",
-                                                  textAlign: TextAlign.center,
-                                                  style:
-                                                      TextStyle(fontSize: 22),
-                                                ),
-                                                Container(
-                                                  margin:
-                                                      EdgeInsets.only(left: 5),
-                                                  child: Icon(
-                                                    Icons.edit,
-                                                    size: 17,
-                                                  ),
-                                                )
-                                              ],
-                                            )),
-                                      ],
+                          return Expanded(
+                              child: Container(
+                            decoration: BoxDecoration(
+                                color: Color.fromRGBO(129, 241, 105, 1)),
+                            child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Diário",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 30),
                                     ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                  padding: EdgeInsets.only(top: 10),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                          flex: 1,
-                                          child: Card(
-                                            color: Colors.green,
-                                            child: Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  0, 15, 0, 15),
-                                              child: Column(
-                                                children: [
-                                                  Text(
-                                                    "Ganhos do dia",
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        fontSize: 15,
-                                                        color: Colors.white),
-                                                  ),
-                                                  Padding(
-                                                      padding: EdgeInsets.only(
-                                                          top: 5),
-                                                      child: Text(
-                                                        "R\$ ${formatCurrency.format(snapshot.data.dayProfit)}",
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                            fontSize: 13,
-                                                            color:
-                                                                Colors.white),
-                                                      )),
-                                                ],
-                                              ),
-                                            ),
-                                          )),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Card(
-                                          color: Colors.red[300],
-                                          child: Padding(
-                                            padding: EdgeInsets.fromLTRB(
-                                                0, 15, 0, 15),
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  "Perdas do dia",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      color: Colors.white),
-                                                ),
-                                                Padding(
-                                                    padding:
-                                                        EdgeInsets.only(top: 5),
-                                                    child: Text(
-                                                      "R\$ ${formatCurrency.format(snapshot.data.dayLoss)}",
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                          fontSize: 13,
-                                                          color: Colors.white),
-                                                    )),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Card(
-                                          color: Colors.blue,
-                                          child: Padding(
-                                            padding: EdgeInsets.fromLTRB(
-                                                0, 15, 0, 15),
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  "Resultado do dia",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      color: Colors.white),
-                                                ),
-                                                Padding(
-                                                    padding:
-                                                        EdgeInsets.only(top: 5),
-                                                    child: Text(
-                                                      "R\$ ${formatCurrency.format(snapshot.data.dayProfit + snapshot.data.dayLoss)}",
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                          fontSize: 13,
-                                                          color: Colors.white),
-                                                    )),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ))
-                            ],
-                          );
+                                    Text(
+                                      "Ganhos",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 23, color: Colors.black),
+                                    ),
+                                    Text(
+                                      "+ ${formatCurrency.format(snapshot.data.dayProfit)}",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                    Text(
+                                      "Perdas",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 23, color: Colors.black),
+                                    ),
+                                    Text(
+                                      "- ${formatCurrency.format(snapshot.data.dayLoss)}",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                    Text(
+                                      "Resultado",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 23, color: Colors.black),
+                                    ),
+                                    Text(
+                                      "+ ${formatCurrency.format(snapshot.data.dayProfit - snapshot.data.dayLoss)}",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 20),
+                                    )
+                                  ],
+                                )),
+                          ));
                         }
                     }
-                  },
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 20, left: 10),
-                  child: Text("Apostas do dia:"),
-                ),
-                BetTable(onSelectRow: openBetPage, onExcludeRow: refreshValues)
-              ],
-            ),
-          ),
-        ),
-      ),
+                  }),
+
+              // Padding(
+              //   padding: EdgeInsets.only(top: 20, left: 10),
+              //   child: Text("Apostas do dia:"),
+              // ),
+              // BetTable(onSelectRow: openBetPage, onExcludeRow: refreshValues)
+            ],
+          )),
       floatingActionButton: FloatingActionButton(
         onPressed: openBetPage,
         tooltip: 'Increment',
