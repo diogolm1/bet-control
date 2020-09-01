@@ -37,5 +37,13 @@ class DatabaseHelper {
         "CREATE TABLE ${BalanceTable.name} (${BalanceTable.columnId} INTEGER PRIMARY KEY"
         ", ${BalanceTable.columnBalance} REAL NOT NULL, ${BalanceTable.columnDate} TEXT NOT NULL"
         ", ${BalanceTable.columnDayProfit} REAL NOT NULL, ${BalanceTable.columnDayLoss});");
+    // await db.insert(
+    //     BalanceTable.name,
+    //     Balance(
+    //             balance: 0,
+    //             date: DateTime.now().toLocal(),
+    //             dayLoss: 0,
+    //             dayProfit: 0)
+    //         .toMap());
   }
 }

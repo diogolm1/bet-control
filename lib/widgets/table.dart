@@ -98,75 +98,331 @@ class BetTableState extends State<BetTable> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(top: 20),
-      child: FutureBuilder(
-          future: getBets(),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-                return Center(
-                  child: Text("Carregando dados..."),
-                );
-              default:
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text("Erro ao carregar dados"),
-                  );
-                } else {
-                  return DataTable(
-                    showCheckboxColumn: false,
-                    columns: <DataColumn>[
-                      DataColumn(
-                          label: Text(
-                        "Nome",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        "Valor",
-                        style: TextStyle(color: Colors.white),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        "Odd",
-                        style: TextStyle(color: Colors.white),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        "Lucro/Prejuízo",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(color: Colors.white),
-                      ))
-                    ],
-                    rows: List<DataRow>.from(snapshot.data
-                        .map((e) => new DataRow(
-                                cells: <DataCell>[
-                                  DataCell(Text(e.name)),
-                                  DataCell(
-                                      Text(formatCurrency.format(e.value))),
-                                  DataCell(Text(e.odd.toString())),
-                                  DataCell(Text(formatCurrency
-                                      .format(e.profit - e.value)))
-                                ],
-                                onSelectChanged: (bool selected) {
-                                  _showOptions(context, e);
-                                },
-                                color:
-                                    MaterialStateProperty.resolveWith((states) {
-                                  if ((e.profit - e.value) < 0) {
-                                    return Color.fromRGBO(223, 0, 1, 0.4);
-                                  } else {
-                                    return Color.fromRGBO(0, 210, 14, 0.3);
-                                  }
-                                })))
-                        .toList()),
-                  );
+    return Column(
+      children: [
+        Container(
+          margin: EdgeInsets.only(top: 50, bottom: 10),
+          child: Text(
+            "Histórico de apostas",
+            style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
+          ),
+        ),
+        Expanded(
+            child: Container(
+          decoration: BoxDecoration(color: Color.fromRGBO(75, 201, 134, 1)),
+          margin: EdgeInsets.only(top: 20),
+          child: FutureBuilder(
+              future: getBets(),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
+                    return Center(
+                      child: Text("Carregando dados..."),
+                    );
+                  default:
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text("Erro ao carregar dados"),
+                      );
+                    } else {
+                      return Column(children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Color.fromRGBO(75, 201, 134, 1)),
+                            child: Column(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              color: Color.fromRGBO(
+                                                  102, 105, 110, 0.4)))),
+                                  child: Container(
+                                    margin: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: Container(
+                                            child: Text(
+                                              "Nome",
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w800),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 3,
+                                          child: Container(
+                                            child: Text(
+                                              "Valor",
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w800),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 2,
+                                          child: Container(
+                                            child: Text(
+                                              "Odd",
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w800),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 3,
+                                          child: Container(
+                                            child: Text(
+                                              "Resultado",
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w800),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Column(
+                                    children: List<Material>.from(snapshot.data
+                                        .map((e) => Material(
+                                            color:
+                                                Color.fromRGBO(75, 201, 134, 1),
+                                            child: InkWell(
+                                                splashColor: Colors.grey,
+                                                onTap: () {
+                                                  _showOptions(context, e);
+                                                },
+                                                child: Container(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10),
+                                                    decoration: BoxDecoration(
+                                                        border: Border(
+                                                            bottom: BorderSide(
+                                                                color: Color
+                                                                    .fromRGBO(
+                                                                        102,
+                                                                        105,
+                                                                        110,
+                                                                        0.4)))),
+                                                    child: Container(
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              10, 0, 10, 10),
+                                                      child: Row(
+                                                        children: [
+                                                          Expanded(
+                                                            flex: 3,
+                                                            child: Container(
+                                                              child: Text(
+                                                                e.name,
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .start,
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        12),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 3,
+                                                            child: Container(
+                                                              child: Text(
+                                                                formatCurrency
+                                                                    .format(e
+                                                                        .value),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .start,
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 2,
+                                                            child: Container(
+                                                              child: Text(
+                                                                e.odd
+                                                                    .toString(),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .start,
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        12),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 3,
+                                                            child: Container(
+                                                              child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .max,
+                                                                  children: [
+                                                                    Container(
+                                                                      margin: EdgeInsets.only(
+                                                                          right:
+                                                                              10),
+                                                                      child: Text(
+                                                                          formatCurrency.format(e.profit -
+                                                                              e.value),
+                                                                          style: TextStyle(color: Colors.black)),
+                                                                    ),
+                                                                    Container(
+                                                                        decoration: BoxDecoration(
+                                                                            color: Color.fromRGBO(
+                                                                                43,
+                                                                                43,
+                                                                                40,
+                                                                                1)),
+                                                                        child: ((e.profit - e.value) >=
+                                                                                0
+                                                                            ? Icon(
+                                                                                Icons.arrow_upward,
+                                                                                color: Colors.green,
+                                                                              )
+                                                                            : Icon(
+                                                                                Icons.arrow_downward,
+                                                                                color: Colors.red,
+                                                                              )))
+                                                                  ]),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    )))))))
+                              ],
+                            ),
+                            // child: DataTable(
+                            //   showCheckboxColumn: false,
+                            //   columns: <DataColumn>[
+                            //     DataColumn(
+                            //         label: Text(
+                            //       "Nome",
+                            //       textAlign: TextAlign.center,
+                            //       style: TextStyle(
+                            //           color: Colors.black,
+                            //           fontSize: 15,
+                            //           fontWeight: FontWeight.w800),
+                            //     )),
+                            //     DataColumn(
+                            //         label: Text(
+                            //       "Valor",
+                            //       style: TextStyle(
+                            //           color: Colors.black,
+                            //           fontSize: 15,
+                            //           fontWeight: FontWeight.w800),
+                            //     )),
+                            //     DataColumn(
+                            //         label: Text(
+                            //       "Odd",
+                            //       style: TextStyle(
+                            //           color: Colors.black,
+                            //           fontSize: 15,
+                            //           fontWeight: FontWeight.w800),
+                            //     )),
+                            //     DataColumn(
+                            //         label: Text(
+                            //       "Resultado",
+                            //       textAlign: TextAlign.start,
+                            //       style: TextStyle(
+                            //           color: Colors.black,
+                            //           fontSize: 15,
+                            //           fontWeight: FontWeight.w800),
+                            //     ))
+                            //   ],
+                            //   rows: List<DataRow>.from(snapshot.data
+                            //       .map((e) => new DataRow(
+                            //             cells: <DataCell>[
+                            //               DataCell(Text(
+                            //                 e.name,
+                            //                 style:
+                            //                     TextStyle(color: Colors.black),
+                            //               )),
+                            //               DataCell(Text(
+                            //                   formatCurrency.format(e.value),
+                            //                   style: TextStyle(
+                            //                       color: Colors.black))),
+                            //               DataCell(Text(e.odd.toString(),
+                            //                   style: TextStyle(
+                            //                       color: Colors.black))),
+                            //               DataCell(Row(
+                            //                   mainAxisAlignment:
+                            //                       MainAxisAlignment.end,
+                            //                   mainAxisSize: MainAxisSize.max,
+                            //                   children: [
+                            //                     Container(
+                            //                       margin: EdgeInsets.only(
+                            //                           right: 10),
+                            //                       child: Text(
+                            //                           formatCurrency.format(
+                            //                               e.profit - e.value),
+                            //                           style: TextStyle(
+                            //                               color: Colors.black)),
+                            //                     ),
+                            //                     Container(
+                            //                         decoration: BoxDecoration(
+                            //                             color: Color.fromRGBO(
+                            //                                 43, 43, 40, 1)),
+                            //                         child: ((e.profit -
+                            //                                     e.value) >=
+                            //                                 0
+                            //                             ? Icon(
+                            //                                 Icons.arrow_upward,
+                            //                                 color: Colors.green,
+                            //                               )
+                            //                             : Icon(
+                            //                                 Icons
+                            //                                     .arrow_downward,
+                            //                                 color: Colors.red,
+                            //                               )))
+                            //                   ]))
+                            //             ],
+                            //             onSelectChanged: (bool selected) {
+                            //               _showOptions(context, e);
+                            //             },
+                            //           ))
+                            //       .toList()),
+                            // ),
+                          ),
+                        )
+                      ]);
+                    }
                 }
-            }
-          }),
+              }),
+        ))
+      ],
     );
   }
 }

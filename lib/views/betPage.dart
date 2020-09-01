@@ -99,6 +99,7 @@ class _BetPageState extends State<BetPage> {
                     children: [
                       Container(
                         child: TextFormField(
+                          maxLength: 30,
                           controller: _nameCtr,
                           validator: (value) {
                             if (value.isEmpty || value == null) {
@@ -107,9 +108,10 @@ class _BetPageState extends State<BetPage> {
                           },
                           style: TextStyle(fontSize: 20),
                           decoration: InputDecoration(
-                            labelText: "Nome",
-                            contentPadding: EdgeInsets.only(bottom: 5, top: 10),
-                          ),
+                              labelText: "Nome",
+                              contentPadding:
+                                  EdgeInsets.only(bottom: 5, top: 10),
+                              counter: Offstage()),
                           textAlignVertical: TextAlignVertical.bottom,
                           textCapitalization: TextCapitalization.sentences,
                           onChanged: (text) {
@@ -181,12 +183,14 @@ class _BetPageState extends State<BetPage> {
                       )),
                       Container(
                         child: TextFormField(
+                          maxLength: 255,
                           controller: _descriptionCtr,
                           style: TextStyle(fontSize: 20),
                           decoration: InputDecoration(
-                            labelText: "Descrição",
-                            contentPadding: EdgeInsets.only(bottom: 5, top: 10),
-                          ),
+                              labelText: "Descrição",
+                              contentPadding:
+                                  EdgeInsets.only(bottom: 5, top: 10),
+                              counter: Offstage()),
                           textCapitalization: TextCapitalization.sentences,
                           onChanged: (text) {
                             _userEdited = true;

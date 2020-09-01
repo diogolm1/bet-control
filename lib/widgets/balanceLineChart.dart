@@ -49,7 +49,7 @@ class _BalanceLineChartState extends State<BalanceLineChart> {
         includeLine: true,
         // dashPattern: [30, 60, 90, 120],
         includePoints: true,
-        radiusPx: 5,
+        radiusPx: 3,
         strokeWidthPx: 2,
       ),
       behaviors: [
@@ -67,8 +67,7 @@ class _BalanceLineChartState extends State<BalanceLineChart> {
                 charts.TextStyleSpec(color: charts.MaterialPalette.white)),
         new charts.ChartTitle("dia/mês",
             behaviorPosition: charts.BehaviorPosition.bottom,
-            titleOutsideJustification:
-                charts.OutsideJustification.middleDrawArea,
+            titleOutsideJustification: charts.OutsideJustification.endDrawArea,
             titleStyleSpec:
                 charts.TextStyleSpec(color: charts.MaterialPalette.white))
       ],
@@ -77,7 +76,7 @@ class _BalanceLineChartState extends State<BalanceLineChart> {
     var chartWidget = new Padding(
       padding: new EdgeInsets.all(10),
       child: new SizedBox(
-        height: 200,
+        height: 250,
         child: chart,
       ),
     );

@@ -128,13 +128,19 @@ class BalanceRepository {
   Future<List<BalancePerDay>> getBalancePerDay(int days) async {
     final db = await DatabaseHelper.instance.database;
     var balances = await db.rawQuery(
-        "SELECT * FROM ${BalanceTable.name} ORDER BY ${BalanceTable.columnId} DESC LIMIT 8");
+        "SELECT * FROM ${BalanceTable.name} ORDER BY ${BalanceTable.columnId} DESC LIMIT 7");
+    List<BalancePerDay> balancesPerDay = List<BalancePerDay>();
 
-    var balancesPerDay = balances
-        .map((e) => new BalancePerDay(
-            DateTime.parse(e[BalanceTable.columnDate]),
-            e[BalanceTable.columnBalance]))
-        .toList();
+    if (balances.length == 0) {
+      var b = await getLast();
+      balancesPerDay.add(BalancePerDay(b.date, b.balance));
+    } else {
+      balancesPerDay = balances
+          .map((e) => new BalancePerDay(
+              DateTime.parse(e[BalanceTable.columnDate]),
+              e[BalanceTable.columnBalance]))
+          .toList();
+    }
 
     while (balancesPerDay.length < 7) {
       var last = balancesPerDay[balancesPerDay.length - 1];
