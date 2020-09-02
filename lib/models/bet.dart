@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:learning/database/tables/betTable.dart';
 
 class Bet {
@@ -34,7 +35,7 @@ class Bet {
   Map toMap() {
     Map<String, dynamic> map = {
       BetTable.columnName: name,
-      BetTable.columnDate: date.toIso8601String(),
+      BetTable.columnDate: DateFormat("yyyy-MM-dd").format(date.toLocal()),
       BetTable.columnDescription: description,
       BetTable.columnOdd: odd,
       BetTable.columnProfit: profit,

@@ -36,6 +36,7 @@ class DatabaseHelper {
     await db.execute(
         "CREATE TABLE ${BalanceTable.name} (${BalanceTable.columnId} INTEGER PRIMARY KEY"
         ", ${BalanceTable.columnBalance} REAL NOT NULL, ${BalanceTable.columnDate} TEXT NOT NULL"
-        ", ${BalanceTable.columnDayProfit} REAL NOT NULL, ${BalanceTable.columnDayLoss});");
+        ", ${BalanceTable.columnDayProfit} REAL NOT NULL, ${BalanceTable.columnDayLoss} REAL NOT NULL"
+        ", ${BalanceTable.columnGrowthRate} REAL NOT NULL)");
   }
 }

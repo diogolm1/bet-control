@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:learning/models/balance.dart';
 import 'package:learning/models/bet.dart';
 
 class BetPage extends StatefulWidget {
@@ -10,6 +13,8 @@ class BetPage extends StatefulWidget {
   @override
   _BetPageState createState() => _BetPageState();
 }
+
+typedef callBackBalance = Future<Balance> Function();
 
 class _BetPageState extends State<BetPage> {
   bool _userEdited = false;
@@ -40,7 +45,7 @@ class _BetPageState extends State<BetPage> {
     }
   }
 
-  void _saveBet() {
+  void _saveBet() async {
     _editedBet.value = _valueCtr.numberValue;
     _editedBet.odd = _oddCtr.numberValue;
     _editedBet.profit = _profitCtr.numberValue;

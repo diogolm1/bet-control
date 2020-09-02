@@ -6,4 +6,5 @@ class BalanceTable {
   static final columnDate = "date";
   static final columnDayProfit = "dayProfit";
   static final columnDayLoss = "dayLoss";
+  static final columnGrowthRate = "growthRate";
 }

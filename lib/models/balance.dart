@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:learning/database/tables/balanceTable.dart';
 
 class Balance {
@@ -6,8 +7,15 @@ class Balance {
   DateTime date;
   double dayProfit;
   double dayLoss;
+  double growthRate;
 
-  Balance({this.id, this.balance, this.date, this.dayProfit, this.dayLoss});
+  Balance(
+      {this.id,
+      this.balance,
+      this.date,
+      this.dayProfit,
+      this.dayLoss,
+      this.growthRate});
 
   Balance.fromMap(Map map) {
     id = map[BalanceTable.columnId];
@@ -15,15 +23,17 @@ class Balance {
     date = DateTime.parse(map[BalanceTable.columnDate]);
     dayProfit = map[BalanceTable.columnDayProfit];
     dayLoss = map[BalanceTable.columnDayLoss];
+    growthRate = map[BalanceTable.columnGrowthRate];
   }
 
   Map toMap() {
     Map<String, dynamic> map = {
       BalanceTable.columnId: id,
       BalanceTable.columnBalance: balance,
-      BalanceTable.columnDate: date.toIso8601String(),
+      BalanceTable.columnDate: DateFormat("yyyy-MM-dd").format(date.toLocal()),
       BalanceTable.columnDayProfit: dayProfit,
-      BalanceTable.columnDayLoss: dayLoss
+      BalanceTable.columnDayLoss: dayLoss,
+      BalanceTable.columnGrowthRate: growthRate
     };
 
     if (id != null) {
@@ -34,6 +44,6 @@ class Balance {
 
   @override
   String toString() {
-    return "Balance(id: $id, balance: $balance, date: $date, dayProfit: $dayProfit, dayLoss: $dayLoss)";
+    return "Balance(id: $id, balance: $balance, date: $date, dayProfit: $dayProfit, dayLoss: $dayLoss, growthRate: $growthRate)";
   }
 }

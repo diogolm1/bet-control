@@ -20,22 +20,19 @@ class BetRepository {
       bet.win = false;
     }
     bet.id = await db.insert(BetTable.name, bet.toMap());
-    BalanceRepository.instance.update(
+    await BalanceRepository.instance.update(
         (bet.profit - bet.value), DateFormat('dd/MM/yyyy').format(bet.date));
     return bet;
   }
 
   Future<List<Bet>> getAll() async {
     final db = await DatabaseHelper.instance.database;
-    var results = await db.query(BetTable.name);
+    var today = DateFormat('yyyy-MM-dd').format(DateTime.now().toLocal());
+    var results = await db.query(BetTable.name,
+        where: '${BetTable.columnDate} = ?', whereArgs: [today]);
+
     var list = results.map((e) => Bet.fromMap(e)).toList();
-    var today = DateTime.now().toLocal();
-    return list
-        .where((element) =>
-            element.date.day == today.day &&
-            element.date.month == today.month &&
-            element.date.year == today.year)
-        .toList();
+    return list;
   }
 
   Future<Bet> getById(int id) async {
@@ -64,10 +61,11 @@ class BetRepository {
   Future<int> delete(int id) async {
     final db = await DatabaseHelper.instance.database;
     var bet = await getById(id);
-    await db.delete(BetTable.name,
-        where: "${BetTable.columnId} = ?", whereArgs: [id]);
 
     await BalanceRepository.instance.updateOnDeleteBet(bet.value - bet.profit);
+
+    await db.delete(BetTable.name,
+        where: "${BetTable.columnId} = ?", whereArgs: [id]);
 
     return id;
   }
@@ -85,7 +83,8 @@ class BetRepository {
     int id = await db.update(BetTable.name, bet.toMap(),
         where: "${BetTable.columnId} = ?", whereArgs: [bet.id]);
 
-    BalanceRepository.instance.update((bet.profit - bet.value) - oldProfit,
+    await BalanceRepository.instance.update(
+        (bet.profit - bet.value) - oldProfit,
         DateFormat('dd/MM/yyyy').format(bet.date));
     return id;
   }

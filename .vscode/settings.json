@@ -1,3 +1,12 @@
 {
-    "cSpell.language": "en,pt"
+    "cSpell.language": "en,pt",
+    "cSpell.words": [
+        "gridline",
+        "gridline renderer spec",
+        "patua",
+        "renderer",
+        "rgbo",
+        "rxdart",
+        "spec"
+    ]
 }

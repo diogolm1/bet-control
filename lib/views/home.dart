@@ -12,6 +12,7 @@ import 'package:learning/views/betPage.dart';
 import 'package:learning/widgets/balanceLineChart.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:learning/widgets/table.dart';
+import 'package:rxdart/rxdart.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -23,8 +24,22 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Bet> bets = [];
-  Balance balance;
+  StreamController<Balance> balanceStream = new BehaviorSubject<Balance>();
   int _currentPage = 0;
+  StreamController<List<BalancePerDay>> balancesPerDayStream =
+      BehaviorSubject<List<BalancePerDay>>();
+
+  GlobalKey<BetTableState> tableKey = new GlobalKey();
+
+  Balance balance;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getBalance();
+    getBalancePerDay(7);
+  }
 
   var formatCurrency = NumberFormat("#,##0.00", "pt");
 
@@ -35,12 +50,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<Balance> getBalance() async {
     var b = await BalanceRepository.instance.getLast();
+    balanceStream.add(b);
     balance = b;
     return b;
   }
 
   Future<List<BalancePerDay>> getBalancePerDay(int days) async {
-    return await BalanceRepository.instance.getBalancePerDay(days);
+    var b = await BalanceRepository.instance.getBalancePerDay(days);
+    balancesPerDayStream.add(b);
+    return b;
   }
 
   MoneyMaskedTextController _editBalanceCtr =
@@ -48,13 +66,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future _editBalance() async {
     await BalanceRepository.instance.updateBalance(_editBalanceCtr.numberValue);
-    var b = await getBalance();
-    setState(() {
-      balance = b;
-    });
+    await getBalance();
   }
 
-  createAlertDialog(BuildContext context) {
+  createAlertDialog(BuildContext context) async {
     _editBalanceCtr.updateValue(balance.balance);
     return showDialog(
         context: context,
@@ -85,12 +100,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void refreshValues() async {
-    var updatedBets = await getBets();
-    var b = await getBalance();
-    setState(() {
-      bets = updatedBets;
-      balance = b;
-    });
+    getBalance();
+    getBalancePerDay(7);
   }
 
   void openBetPage({Bet bet}) async {
@@ -107,17 +118,17 @@ class _MyHomePageState extends State<MyHomePage> {
       } else {
         await BetRepository.instance.insert(newBet);
       }
-      refreshValues();
+      await getBalance();
+      if (tableKey.currentState != null) {
+        tableKey.currentState.getBets();
+        tableKey.currentState.scrollToBottom();
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(widget.title),
-      //   centerTitle: true,
-      // ),
       backgroundColor: Color.fromRGBO(53, 51, 51, 1),
       body: Column(children: [
         Builder(
@@ -141,8 +152,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        FutureBuilder(
-                          future: getBalance(),
+                        StreamBuilder(
+                          stream: balanceStream.stream,
                           builder: (context, snapshot) {
                             switch (snapshot.connectionState) {
                               case ConnectionState.none:
@@ -156,7 +167,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: Text("Erro ao carregar dados."),
                                   );
                                 } else {
-                                  balance = snapshot.data;
                                   return Expanded(
                                       child: Column(children: [
                                     Container(
@@ -171,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           Text(
                                               "Banca atual: R\$ ${formatCurrency.format(snapshot.data.balance)}",
                                               style: GoogleFonts.patuaOne(
-                                                  fontSize: 25,
+                                                  fontSize: 30,
                                                   fontWeight: FontWeight.w500)),
                                           Container(
                                             margin: EdgeInsets.only(left: 5),
@@ -187,8 +197,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     Container(
                                         margin: EdgeInsets.only(
                                             top: 15, bottom: 30),
-                                        child: FutureBuilder(
-                                            future: getBalancePerDay(7),
+                                        child: StreamBuilder(
+                                            stream: balancesPerDayStream.stream,
                                             builder: (context, snapshot) {
                                               switch (
                                                   snapshot.connectionState) {
@@ -236,70 +246,94 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           fontWeight:
                                                               FontWeight.w900),
                                                     ),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
                                                               .center,
                                                       children: [
                                                         Container(
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  bottom: 5),
-                                                          child: Text(
-                                                            "Ganhos",
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: TextStyle(
-                                                                fontSize: 23,
-                                                                color: Colors
-                                                                    .black,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600),
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          "+ ${formatCurrency.format(snapshot.data.dayProfit)}",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: TextStyle(
-                                                              fontSize: 20,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Column(
-                                                      children: [
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    right: 15),
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Container(
+                                                                  margin: EdgeInsets
+                                                                      .only(
+                                                                          bottom:
+                                                                              5),
+                                                                  child: Text(
+                                                                    "Ganhos",
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            23,
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontWeight:
+                                                                            FontWeight.w600),
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  "+ ${formatCurrency.format(snapshot.data.dayProfit)}",
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500),
+                                                                ),
+                                                              ],
+                                                            )),
                                                         Container(
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  bottom: 5),
-                                                          child: Text(
-                                                            "Perdas",
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: TextStyle(
-                                                                fontSize: 23,
-                                                                color: Colors
-                                                                    .black,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600),
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          "- ${snapshot.data.dayLoss < 0 ? formatCurrency.format(snapshot.data.dayLoss * -1) : formatCurrency.format(snapshot.data.dayLoss)}",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: TextStyle(
-                                                              fontSize: 20,
-                                                              color: Colors.red,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500),
-                                                        ),
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    left: 15),
+                                                            child: Column(
+                                                              children: [
+                                                                Container(
+                                                                  margin: EdgeInsets
+                                                                      .only(
+                                                                          bottom:
+                                                                              5),
+                                                                  child: Text(
+                                                                    "Perdas",
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            23,
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontWeight:
+                                                                            FontWeight.w600),
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  "- ${formatCurrency.format(snapshot.data.dayLoss.abs())}",
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                      color: Colors
+                                                                          .red,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500),
+                                                                ),
+                                                              ],
+                                                            )),
                                                       ],
                                                     ),
                                                     Column(
@@ -322,7 +356,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           ),
                                                         ),
                                                         Text(
-                                                          "${(snapshot.data.dayProfit + snapshot.data.dayLoss) >= 0 ? "+ " + formatCurrency.format(snapshot.data.dayProfit + snapshot.data.dayLoss) : "- " + formatCurrency.format((snapshot.data.dayProfit + snapshot.data.dayLoss) * -1)}",
+                                                          "${(snapshot.data.dayProfit + snapshot.data.dayLoss) >= 0 ? "+ " + formatCurrency.format(snapshot.data.dayProfit + snapshot.data.dayLoss) : "- " + formatCurrency.format((snapshot.data.dayProfit + snapshot.data.dayLoss).abs())}",
                                                           textAlign:
                                                               TextAlign.center,
                                                           style: TextStyle(
@@ -339,7 +373,37 @@ class _MyHomePageState extends State<MyHomePage> {
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w500),
-                                                        )
+                                                        ),
+                                                        Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    right: 5,
+                                                                    top: 10),
+                                                            child: Text(
+                                                              (snapshot.data.growthRate >=
+                                                                          0
+                                                                      ? "+ "
+                                                                      : "- ") +
+                                                                  (snapshot.data
+                                                                              .growthRate *
+                                                                          100)
+                                                                      .abs()
+                                                                      .toStringAsFixed(
+                                                                          2) +
+                                                                  "%",
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                  color: (snapshot
+                                                                              .data.growthRate >=
+                                                                          0
+                                                                      ? Colors
+                                                                          .white
+                                                                      : Colors
+                                                                          .red),
+                                                                  fontSize: 18),
+                                                            ))
                                                       ],
                                                     ),
                                                   ],
@@ -351,7 +415,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ],
                     )),
-                BetTable(onSelectRow: openBetPage, onExcludeRow: refreshValues),
+                BetTable(
+                    onSelectRow: openBetPage,
+                    onExcludeRow: refreshValues,
+                    key: tableKey),
               ],
             );
           },
