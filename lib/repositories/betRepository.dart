@@ -20,7 +20,7 @@ class BetRepository {
       bet.win = false;
     }
     bet.id = await db.insert(BetTable.name, bet.toMap());
-    await BalanceRepository.instance.update(
+    await BalanceRepository.instance.updateOnInsertBet(
         (bet.profit - bet.value), DateFormat('dd/MM/yyyy').format(bet.date));
     return bet;
   }
@@ -74,7 +74,6 @@ class BetRepository {
     final db = await DatabaseHelper.instance.database;
 
     final oldBet = await getById(bet.id);
-    double oldProfit = oldBet.profit - oldBet.value;
     if (bet.profit > bet.value) {
       bet.win = true;
     } else {
@@ -83,9 +82,8 @@ class BetRepository {
     int id = await db.update(BetTable.name, bet.toMap(),
         where: "${BetTable.columnId} = ?", whereArgs: [bet.id]);
 
-    await BalanceRepository.instance.update(
-        (bet.profit - bet.value) - oldProfit,
-        DateFormat('dd/MM/yyyy').format(bet.date));
+    await BalanceRepository.instance
+        .updateOnEditBet(oldBet.value, oldBet.profit, bet.value, bet.profit);
     return id;
   }
 

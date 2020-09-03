@@ -28,8 +28,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentPage = 0;
   StreamController<List<BalancePerDay>> balancesPerDayStream =
       BehaviorSubject<List<BalancePerDay>>();
-
-  GlobalKey<BetTableState> tableKey = new GlobalKey();
+  StreamController<List<Bet>> betsStream = new BehaviorSubject<List<Bet>>();
+  String growthRate = "";
 
   Balance balance;
 
@@ -39,20 +39,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
     getBalance();
     getBalancePerDay(7);
+    getBets();
   }
 
   var formatCurrency = NumberFormat("#,##0.00", "pt");
-
-  Future<List<Bet>> getBets() async {
-    var bets = await BetRepository.instance.getAll();
-    return bets;
-  }
 
   Future<Balance> getBalance() async {
     var b = await BalanceRepository.instance.getLast();
     balanceStream.add(b);
     balance = b;
     return b;
+  }
+
+  Future<List<Bet>> getBets() async {
+    var bets = await BetRepository.instance.getAll();
+    betsStream.add(bets);
+    return bets;
   }
 
   Future<List<BalancePerDay>> getBalancePerDay(int days) async {
@@ -102,15 +104,90 @@ class _MyHomePageState extends State<MyHomePage> {
   void refreshValues() async {
     getBalance();
     getBalancePerDay(7);
+    getBets();
   }
 
-  void openBetPage({Bet bet}) async {
-    Bet newBet = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => BetPage(
-                  bet: bet,
-                )));
+  void _deleteBet(int id) async {
+    await BetRepository.instance.delete(id);
+    refreshValues();
+  }
+
+  Future _deleteConfirmation(int id) async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Excluir registro?"),
+            content: Text("Deseja excluir a aposta?"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Cancelar"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text("Sim"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _deleteBet(id);
+                },
+              )
+            ],
+          );
+        });
+  }
+
+  void showOptions({BuildContext context, Bet bet}) async {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return BottomSheet(
+            backgroundColor: Color.fromRGBO(53, 51, 51, 1),
+            onClosing: () {},
+            builder: (context) {
+              return Container(
+                padding: EdgeInsets.all((10)),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FlatButton(
+                      child: Text(
+                        "Editar",
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _showDialogBet(bet: bet);
+                      },
+                    ),
+                    FlatButton(
+                      child: Text(
+                        "Excluir",
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _deleteConfirmation(bet.id);
+                      },
+                    )
+                  ],
+                ),
+              );
+            },
+          );
+        });
+  }
+
+  void _showDialogBet({Bet bet}) async {
+    Bet newBet = await showDialog(
+        context: context,
+        child: new Dialog(
+          insetPadding: EdgeInsets.fromLTRB(15, 30, 10, 10),
+          child: BetPage(
+            bet: bet,
+          ),
+        ));
 
     if (newBet != null) {
       if (newBet.id != null) {
@@ -118,11 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
       } else {
         await BetRepository.instance.insert(newBet);
       }
-      await getBalance();
-      if (tableKey.currentState != null) {
-        tableKey.currentState.getBets();
-        tableKey.currentState.scrollToBottom();
-      }
+      refreshValues();
     }
   }
 
@@ -167,6 +240,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: Text("Erro ao carregar dados."),
                                   );
                                 } else {
+                                  if (snapshot.data.growthRate > 0) {
+                                    growthRate =
+                                        "+ ${formatCurrency.format(snapshot.data.growthRate * 100)}%";
+                                  } else if (snapshot.data.growthRate < 0) {
+                                    growthRate =
+                                        "- ${formatCurrency.format(snapshot.data.growthRate.abs() * 100)}%";
+                                  } else {
+                                    growthRate = "";
+                                  }
                                   return Expanded(
                                       child: Column(children: [
                                     Container(
@@ -228,7 +310,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 color: Color.fromRGBO(
                                                     75, 201, 134, 1)),
                                             child: Padding(
-                                                padding: EdgeInsets.all(10),
+                                                padding: EdgeInsets.fromLTRB(
+                                                    10, 10, 10, 20),
                                                 child: Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
@@ -355,55 +438,55 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                         .w600),
                                                           ),
                                                         ),
-                                                        Text(
-                                                          "${(snapshot.data.dayProfit + snapshot.data.dayLoss) >= 0 ? "+ " + formatCurrency.format(snapshot.data.dayProfit + snapshot.data.dayLoss) : "- " + formatCurrency.format((snapshot.data.dayProfit + snapshot.data.dayLoss).abs())}",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: TextStyle(
-                                                              color: ((snapshot
-                                                                              .data
-                                                                              .dayProfit +
-                                                                          snapshot
-                                                                              .data
-                                                                              .dayLoss) >=
-                                                                      0
-                                                                  ? Colors.white
-                                                                  : Colors.red),
-                                                              fontSize: 20,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500),
-                                                        ),
                                                         Container(
-                                                            margin:
-                                                                EdgeInsets.only(
-                                                                    right: 5,
-                                                                    top: 10),
-                                                            child: Text(
-                                                              (snapshot.data.growthRate >=
-                                                                          0
-                                                                      ? "+ "
-                                                                      : "- ") +
-                                                                  (snapshot.data
-                                                                              .growthRate *
-                                                                          100)
-                                                                      .abs()
-                                                                      .toStringAsFixed(
-                                                                          2) +
-                                                                  "%",
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              style: TextStyle(
-                                                                  color: (snapshot
-                                                                              .data.growthRate >=
-                                                                          0
-                                                                      ? Colors
-                                                                          .white
-                                                                      : Colors
-                                                                          .red),
-                                                                  fontSize: 18),
-                                                            ))
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              Text(
+                                                                "${(snapshot.data.dayProfit + snapshot.data.dayLoss) >= 0 ? "+ " + formatCurrency.format(snapshot.data.dayProfit + snapshot.data.dayLoss) : "- " + formatCurrency.format((snapshot.data.dayProfit + snapshot.data.dayLoss).abs())} ",
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .start,
+                                                                style: TextStyle(
+                                                                    color: ((snapshot.data.dayProfit + snapshot.data.dayLoss) >=
+                                                                            0
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .red),
+                                                                    fontSize:
+                                                                        20,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500),
+                                                              ),
+                                                              Container(
+                                                                margin: EdgeInsets
+                                                                    .only(
+                                                                        top: 5),
+                                                                child: Text(
+                                                                  growthRate,
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .end,
+                                                                  style: TextStyle(
+                                                                      color: ((snapshot.data.dayProfit + snapshot.data.dayLoss) >= 0
+                                                                          ? Colors
+                                                                              .white
+                                                                          : Colors
+                                                                              .red),
+                                                                      fontSize:
+                                                                          15,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
                                                       ],
                                                     ),
                                                   ],
@@ -415,10 +498,28 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ],
                     )),
-                BetTable(
-                    onSelectRow: openBetPage,
-                    onExcludeRow: refreshValues,
-                    key: tableKey),
+                StreamBuilder(
+                    stream: betsStream.stream,
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.none:
+                        case ConnectionState.waiting:
+                          return Center(
+                            child: Text("Carregando dados..."),
+                          );
+                        default:
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text("Erro ao carregar dados"),
+                            );
+                          } else {
+                            return BetTable(
+                              bets: snapshot.data,
+                              showTableOptions: showOptions,
+                            );
+                          }
+                      }
+                    })
               ],
             );
           },
@@ -452,9 +553,9 @@ class _MyHomePageState extends State<MyHomePage> {
         )
       ]),
       floatingActionButton: FloatingActionButton(
-        onPressed: openBetPage,
+        onPressed: _showDialogBet,
         backgroundColor: Color.fromRGBO(149, 242, 56, 1),
-        tooltip: 'Increment',
+        tooltip: 'Cadastrar aposta',
         child: Icon(
           Icons.add,
           color: Colors.black,

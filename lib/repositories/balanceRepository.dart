@@ -96,14 +96,11 @@ class BalanceRepository {
         where: "${BalanceTable.columnId} = ?", whereArgs: [id]);
   }
 
-  Future<int> update(double profit, String date) async {
+  Future<int> updateOnInsertBet(double profit, String date) async {
     final db = await DatabaseHelper.instance.database;
     var b = await getLast();
-    var balanceYesterday = await getByDate(b.date.subtract(Duration(days: 1)));
 
-    final rate = balanceYesterday == null
-        ? 0.0
-        : calculateGrowthRate(b.balance + profit, balanceYesterday.balance);
+    final rate = await calculateGrowthRate(b.balance + profit, b.date);
 
     if (date != DateFormat('dd/MM/yyyy').format(b.date)) {
       Balance newBalance = await insert(Balance(
@@ -115,9 +112,9 @@ class BalanceRepository {
       return newBalance.id;
     } else {
       b.balance += profit;
+      b.growthRate = rate;
       b.dayProfit += profit > 0 ? profit : 0;
       b.dayLoss += profit < 0 ? profit : 0;
-      b.growthRate = rate;
 
       return await db.update(BalanceTable.name, b.toMap(),
           where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
@@ -128,11 +125,8 @@ class BalanceRepository {
     final db = await DatabaseHelper.instance.database;
     var b = await getLast();
 
-    var balanceYesterday = await getByDate(b.date.subtract(Duration(days: 1)));
     b.balance = balance;
-    b.growthRate = balanceYesterday == null
-        ? 0.0
-        : calculateGrowthRate(balance, balanceYesterday.balance);
+    b.growthRate = await calculateGrowthRate(balance, b.date);
     return await db.update(BalanceTable.name, b.toMap(),
         where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
   }
@@ -140,12 +134,9 @@ class BalanceRepository {
   Future updateOnDeleteBet(double profit) async {
     final db = await DatabaseHelper.instance.database;
     var b = await getLast();
-    var balanceYesterday = await getByDate(b.date.subtract(Duration(days: 1)));
 
     b.balance += profit;
-    b.growthRate = balanceYesterday == null
-        ? 0.0
-        : calculateGrowthRate(b.balance, balanceYesterday.balance);
+    b.growthRate = await calculateGrowthRate(b.balance, b.date);
     if (profit < 0) {
       b.dayProfit += profit;
     } else {
@@ -186,8 +177,33 @@ class BalanceRepository {
     return balancesPerDay;
   }
 
-  double calculateGrowthRate(double balance1, double balance2) {
-    double difference = balance1 - balance2;
-    return difference / balance2;
+  Future updateOnEditBet(double oldValue, double oldProfit, double newValue,
+      double newProfit) async {
+    final db = await DatabaseHelper.instance.database;
+    var b = await getLast();
+
+    //removing values of oldBet
+    final oldDifference = (oldValue - oldProfit);
+    b.balance += oldDifference;
+    b.dayProfit += oldDifference < 0 ? oldDifference : 0;
+    b.dayLoss += oldDifference > 0 ? oldDifference : 0;
+
+    //insert values of new bet
+    final newDifference = (newProfit - newValue);
+    b.balance += newDifference;
+    b.dayProfit += newDifference > 0 ? newDifference : 0;
+    b.dayLoss += newDifference < 0 ? newDifference : 0;
+
+    b.growthRate = await calculateGrowthRate(b.balance, b.date);
+
+    await db.update(BalanceTable.name, b.toMap(),
+        where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
+  }
+
+  Future<double> calculateGrowthRate(double balance1, DateTime date) async {
+    var balanceYesterday = await getByDate(date.subtract(Duration(days: 1)));
+    if (balanceYesterday == null) return 0.0;
+    double difference = balance1 - balanceYesterday.balance;
+    return difference / balanceYesterday.balance;
   }
 }

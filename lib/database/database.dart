@@ -4,7 +4,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
-  static final _databaseName = "BetDB.db";
+  static final _databaseName = "BetControlDB.db";
   static final _databaseVersion = 2;
 
   DatabaseHelper._internal();
