@@ -29,17 +29,14 @@ class BetTable extends StatelessWidget {
           child: Column(children: [
             Expanded(
               child: Container(
-                decoration:
-                    BoxDecoration(color: Color.fromRGBO(75, 201, 134, 1)),
+                decoration: BoxDecoration(color: Color.fromRGBO(75, 201, 134, 1)),
                 child: SingleChildScrollView(
                     // controller: scrollController,
                     child: Column(
                   children: [
                     Container(
-                      decoration: BoxDecoration(
-                          border: Border(
-                              bottom: BorderSide(
-                                  color: Color.fromRGBO(102, 105, 110, 0.4)))),
+                      decoration:
+                          BoxDecoration(border: Border(bottom: BorderSide(color: Color.fromRGBO(102, 105, 110, 0.4)))),
                       child: Container(
                         margin: EdgeInsets.fromLTRB(10, 15, 10, 15),
                         child: Row(
@@ -50,10 +47,7 @@ class BetTable extends StatelessWidget {
                                 child: Text(
                                   "Nome",
                                   textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w800),
+                                  style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w800),
                                 ),
                               ),
                             ),
@@ -63,10 +57,7 @@ class BetTable extends StatelessWidget {
                                 child: Text(
                                   "Valor",
                                   textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w800),
+                                  style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w800),
                                 ),
                               ),
                             ),
@@ -76,10 +67,7 @@ class BetTable extends StatelessWidget {
                                 child: Text(
                                   "Odd",
                                   textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w800),
+                                  style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w800),
                                 ),
                               ),
                             ),
@@ -89,10 +77,7 @@ class BetTable extends StatelessWidget {
                                 child: Text(
                                   "Resultado",
                                   textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w800),
+                                  style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w800),
                                 ),
                               ),
                             )
@@ -111,13 +96,9 @@ class BetTable extends StatelessWidget {
                                 child: Container(
                                     padding: EdgeInsets.only(top: 10),
                                     decoration: BoxDecoration(
-                                        border: Border(
-                                            bottom: BorderSide(
-                                                color: Color.fromRGBO(
-                                                    102, 105, 110, 0.4)))),
+                                        border: Border(bottom: BorderSide(color: Color.fromRGBO(102, 105, 110, 0.4)))),
                                     child: Container(
-                                      margin:
-                                          EdgeInsets.fromLTRB(10, 0, 10, 10),
+                                      margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
                                       child: Row(
                                         children: [
                                           Expanded(
@@ -126,9 +107,7 @@ class BetTable extends StatelessWidget {
                                               child: Text(
                                                 e.name,
                                                 textAlign: TextAlign.start,
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 12),
+                                                style: TextStyle(color: Colors.black, fontSize: 12),
                                               ),
                                             ),
                                           ),
@@ -151,9 +130,7 @@ class BetTable extends StatelessWidget {
                                               child: Text(
                                                 e.odd.toString(),
                                                 textAlign: TextAlign.start,
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 12),
+                                                style: TextStyle(color: Colors.black, fontSize: 12),
                                               ),
                                             ),
                                           ),
@@ -161,46 +138,24 @@ class BetTable extends StatelessWidget {
                                             flex: 3,
                                             child: Container(
                                               child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  mainAxisSize: MainAxisSize.max,
                                                   children: [
                                                     Container(
-                                                      margin: EdgeInsets.only(
-                                                          right: 10),
-                                                      child: Text(
-                                                          formatCurrency.format(
-                                                              e.profit -
-                                                                  e.value),
-                                                          style: TextStyle(
-                                                              color: Colors
-                                                                  .black)),
+                                                      margin: EdgeInsets.only(right: 10),
+                                                      child: Text(formatCurrency.format(e.profit - e.value),
+                                                          style: TextStyle(color: Colors.black)),
                                                     ),
                                                     Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                                color: Color
-                                                                    .fromRGBO(
-                                                                        43,
-                                                                        43,
-                                                                        40,
-                                                                        1)),
-                                                        child: ((e.profit -
-                                                                    e.value) >=
-                                                                0
+                                                        decoration: BoxDecoration(color: Color.fromRGBO(43, 43, 40, 1)),
+                                                        child: ((e.profit - e.value) >= 0
                                                             ? Icon(
-                                                                Icons
-                                                                    .arrow_upward,
-                                                                color: Colors
-                                                                    .green,
+                                                                Icons.arrow_upward,
+                                                                color: Colors.green,
                                                               )
                                                             : Icon(
-                                                                Icons
-                                                                    .arrow_downward,
-                                                                color:
-                                                                    Colors.red,
+                                                                Icons.arrow_downward,
+                                                                color: Colors.red,
                                                               )))
                                                   ]),
                                             ),

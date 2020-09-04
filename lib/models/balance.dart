@@ -9,13 +9,7 @@ class Balance {
   double dayLoss;
   double growthRate;
 
-  Balance(
-      {this.id,
-      this.balance,
-      this.date,
-      this.dayProfit,
-      this.dayLoss,
-      this.growthRate});
+  Balance({this.id, this.balance, this.date, this.dayProfit, this.dayLoss, this.growthRate});
 
   Balance.fromMap(Map map) {
     id = map[BalanceTable.columnId];

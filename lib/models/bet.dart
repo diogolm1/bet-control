@@ -11,15 +11,7 @@ class Bet {
   bool win;
   double profit;
 
-  Bet(
-      {this.id,
-      this.name,
-      this.date,
-      this.description,
-      this.odd,
-      this.profit,
-      this.value,
-      this.win});
+  Bet({this.id, this.name, this.date, this.description, this.odd, this.profit, this.value, this.win});
 
   Bet.fromMap(Map map) {
     id = map[BetTable.columnId];

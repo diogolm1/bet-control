@@ -29,8 +29,7 @@ class BalanceRepository {
   Future<Balance> getByDate(DateTime date) async {
     final db = await DatabaseHelper.instance.database;
     final dateString = DateFormat('yyyy-MM-dd').format(date);
-    var result = await db.query(BalanceTable.name,
-        where: "${BalanceTable.columnDate} = ?", whereArgs: [dateString]);
+    var result = await db.query(BalanceTable.name, where: "${BalanceTable.columnDate} = ?", whereArgs: [dateString]);
 
     if (result.length > 0) {
       return Balance.fromMap(result.first);
@@ -60,40 +59,26 @@ class BalanceRepository {
 
   Future<Balance> getLast() async {
     final db = await DatabaseHelper.instance.database;
-    var result = await db.rawQuery(
-        "SELECT * FROM ${BalanceTable.name} ORDER BY ${BalanceTable.columnId} DESC LIMIT 1");
+    var result = await db.rawQuery("SELECT * FROM ${BalanceTable.name} ORDER BY ${BalanceTable.columnId} DESC LIMIT 1");
     if (result.length > 0) {
       return await _returnUpdatedBalance(Balance.fromMap(result.first));
     } else {
-      return await insert(Balance(
-          balance: 0,
-          date: DateTime.now().toLocal(),
-          dayProfit: 0,
-          dayLoss: 0,
-          growthRate: 0));
+      return await insert(Balance(balance: 0, date: DateTime.now().toLocal(), dayProfit: 0, dayLoss: 0, growthRate: 0));
     }
   }
 
   Future<Balance> _returnUpdatedBalance(Balance b) async {
     final today = DateTime.now().toLocal();
-    if (b.date.day == today.day &&
-        b.date.month == today.month &&
-        b.date.year == today.year) {
+    if (b.date.day == today.day && b.date.month == today.month && b.date.year == today.year) {
       return b;
     } else {
-      return await insert(Balance(
-          balance: b.balance,
-          date: today,
-          dayLoss: 0,
-          dayProfit: 0,
-          growthRate: 0));
+      return await insert(Balance(balance: b.balance, date: today, dayLoss: 0, dayProfit: 0, growthRate: 0));
     }
   }
 
   Future<int> delete(int id) async {
     final db = await DatabaseHelper.instance.database;
-    return await db.delete(BalanceTable.name,
-        where: "${BalanceTable.columnId} = ?", whereArgs: [id]);
+    return await db.delete(BalanceTable.name, where: "${BalanceTable.columnId} = ?", whereArgs: [id]);
   }
 
   Future<int> updateOnInsertBet(double profit, String date) async {
@@ -116,8 +101,7 @@ class BalanceRepository {
       b.dayProfit += profit > 0 ? profit : 0;
       b.dayLoss += profit < 0 ? profit : 0;
 
-      return await db.update(BalanceTable.name, b.toMap(),
-          where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
+      return await db.update(BalanceTable.name, b.toMap(), where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
     }
   }
 
@@ -127,8 +111,7 @@ class BalanceRepository {
 
     b.balance = balance;
     b.growthRate = await calculateGrowthRate(balance, b.date);
-    return await db.update(BalanceTable.name, b.toMap(),
-        where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
+    return await db.update(BalanceTable.name, b.toMap(), where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
   }
 
   Future updateOnDeleteBet(double profit) async {
@@ -142,8 +125,7 @@ class BalanceRepository {
     } else {
       b.dayLoss += profit;
     }
-    return await db.update(BalanceTable.name, b.toMap(),
-        where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
+    return await db.update(BalanceTable.name, b.toMap(), where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
   }
 
   Future close() async {
@@ -153,8 +135,8 @@ class BalanceRepository {
 
   Future<List<BalancePerDay>> getBalancePerDay(int days) async {
     final db = await DatabaseHelper.instance.database;
-    var balances = await db.rawQuery(
-        "SELECT * FROM ${BalanceTable.name} ORDER BY ${BalanceTable.columnId} DESC LIMIT 7");
+    var balances =
+        await db.rawQuery("SELECT * FROM ${BalanceTable.name} ORDER BY ${BalanceTable.columnId} DESC LIMIT 7");
     List<BalancePerDay> balancesPerDay = List<BalancePerDay>();
 
     if (balances.length == 0) {
@@ -162,23 +144,19 @@ class BalanceRepository {
       balancesPerDay.add(BalancePerDay(b.date, b.balance));
     } else {
       balancesPerDay = balances
-          .map((e) => new BalancePerDay(
-              DateTime.parse(e[BalanceTable.columnDate]),
-              e[BalanceTable.columnBalance]))
+          .map((e) => new BalancePerDay(DateTime.parse(e[BalanceTable.columnDate]), e[BalanceTable.columnBalance]))
           .toList();
     }
 
     while (balancesPerDay.length < 7) {
       var last = balancesPerDay[balancesPerDay.length - 1];
-      balancesPerDay
-          .add(BalancePerDay(last.date.subtract(Duration(days: 1)), 0));
+      balancesPerDay.add(BalancePerDay(last.date.subtract(Duration(days: 1)), 0));
     }
 
     return balancesPerDay;
   }
 
-  Future updateOnEditBet(double oldValue, double oldProfit, double newValue,
-      double newProfit) async {
+  Future updateOnEditBet(double oldValue, double oldProfit, double newValue, double newProfit) async {
     final db = await DatabaseHelper.instance.database;
     var b = await getLast();
 
@@ -196,8 +174,7 @@ class BalanceRepository {
 
     b.growthRate = await calculateGrowthRate(b.balance, b.date);
 
-    await db.update(BalanceTable.name, b.toMap(),
-        where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
+    await db.update(BalanceTable.name, b.toMap(), where: "${BalanceTable.columnId} = ?", whereArgs: [b.id]);
   }
 
   Future<double> calculateGrowthRate(double balance1, DateTime date) async {

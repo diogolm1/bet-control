@@ -59,8 +59,7 @@ class _BetPageState extends State<BetPage> {
           builder: (context) {
             return AlertDialog(
               title: Text("Descartar alterações?"),
-              content: Text(
-                  "Ao retornar as alterações feitas serão perdidas. Deseja continuar?"),
+              content: Text("Ao retornar as alterações feitas serão perdidas. Deseja continuar?"),
               actions: <Widget>[
                 FlatButton(
                   child: Text("Cancelar"),
@@ -101,9 +100,7 @@ class _BetPageState extends State<BetPage> {
                         child: Text(
                           "Nova aposta",
                           style: TextStyle(
-                              color: Color.fromRGBO(75, 201, 134, 1),
-                              fontSize: 32,
-                              fontWeight: FontWeight.w700),
+                              color: Color.fromRGBO(75, 201, 134, 1), fontSize: 32, fontWeight: FontWeight.w700),
                         ),
                       ),
                       Container(
@@ -183,8 +180,7 @@ class _BetPageState extends State<BetPage> {
                                       decoration: InputDecoration(
                                         labelText: "Odd",
                                         border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                           borderSide: BorderSide(),
                                         ),
                                       ),
@@ -258,9 +254,7 @@ class _BetPageState extends State<BetPage> {
                                   textColor: Colors.white,
                                   child: Text(
                                     "Salvar",
-                                    style: TextStyle(
-                                        fontSize: 27,
-                                        fontWeight: FontWeight.w800),
+                                    style: TextStyle(fontSize: 27, fontWeight: FontWeight.w800),
                                   ),
                                 )),
                           ],

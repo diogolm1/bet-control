@@ -24,9 +24,7 @@ class _BalanceLineChartState extends State<BalanceLineChart> {
     ];
 
     var customDomainAxis = new charts.DateTimeAxisSpec(
-        renderSpec: charts.GridlineRendererSpec(
-            labelStyle:
-                charts.TextStyleSpec(color: charts.MaterialPalette.white)),
+        renderSpec: charts.GridlineRendererSpec(labelStyle: charts.TextStyleSpec(color: charts.MaterialPalette.white)),
         tickFormatterSpec: new charts.AutoDateTimeTickFormatterSpec(
             day: new charts.TimeFormatterSpec(
           format: 'dd/MM',
@@ -56,20 +54,16 @@ class _BalanceLineChartState extends State<BalanceLineChart> {
         new charts.ChartTitle("Evolução da banca",
             behaviorPosition: charts.BehaviorPosition.top,
             titleOutsideJustification: charts.OutsideJustification.start,
-            titleStyleSpec:
-                charts.TextStyleSpec(color: charts.MaterialPalette.white),
+            titleStyleSpec: charts.TextStyleSpec(color: charts.MaterialPalette.white),
             innerPadding: 30),
         new charts.ChartTitle("Banca (R\$)",
             behaviorPosition: charts.BehaviorPosition.start,
-            titleOutsideJustification:
-                charts.OutsideJustification.middleDrawArea,
-            titleStyleSpec:
-                charts.TextStyleSpec(color: charts.MaterialPalette.white)),
+            titleOutsideJustification: charts.OutsideJustification.middleDrawArea,
+            titleStyleSpec: charts.TextStyleSpec(color: charts.MaterialPalette.white)),
         new charts.ChartTitle("dia/mês",
             behaviorPosition: charts.BehaviorPosition.bottom,
             titleOutsideJustification: charts.OutsideJustification.endDrawArea,
-            titleStyleSpec:
-                charts.TextStyleSpec(color: charts.MaterialPalette.white))
+            titleStyleSpec: charts.TextStyleSpec(color: charts.MaterialPalette.white))
       ],
     );
 
