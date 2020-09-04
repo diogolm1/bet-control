@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:learning/models/bet.dart';
+import 'package:betcontrol/models/bet.dart';
 
 typedef showOptions = void Function({Bet bet, BuildContext context});
 
@@ -17,7 +17,7 @@ class BetTable extends StatelessWidget {
       children: [
         Container(
           margin: EdgeInsets.only(top: 50, bottom: 10),
-          child: Text(
+          child: const Text(
             "Histórico de apostas",
             style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
           ),

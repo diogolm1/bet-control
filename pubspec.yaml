@@ -1,5 +1,5 @@
-name: learning
-description: A new Flutter project.
+name: betcontrol
+description: App para controle de apostas.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -61,6 +61,12 @@ flutter:
   assets:
     - assets/icon/icon.png
     - assets/logo/logo.png
+
+  fonts:
+    - family: PatuaOne
+      fonts:
+        - asset: assets/fonts/PatuaOne-Regular.ttf
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

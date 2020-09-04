@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
-import 'package:learning/models/balance.dart';
-import 'package:learning/models/bet.dart';
+import 'package:betcontrol/models/balance.dart';
+import 'package:betcontrol/models/bet.dart';
 
 class BetPage extends StatefulWidget {
   final Bet bet;
@@ -24,10 +24,9 @@ class _BetPageState extends State<BetPage> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final _nameCtr = TextEditingController();
-  final _valueCtr = MoneyMaskedTextController(precision: 2, initialValue: null);
-  final _oddCtr = MoneyMaskedTextController(precision: 2, initialValue: null);
-  final _profitCtr =
-      MoneyMaskedTextController(precision: 2, initialValue: null);
+  final _valueCtr = MoneyMaskedTextController(precision: 2);
+  final _oddCtr = MoneyMaskedTextController(precision: 2);
+  final _profitCtr = MoneyMaskedTextController(precision: 2);
   final _descriptionCtr = TextEditingController();
 
   @override
@@ -148,7 +147,9 @@ class _BetPageState extends State<BetPage> {
                                 controller: _valueCtr,
                                 validator: (value) {
                                   if (_valueCtr.numberValue == 0) {
-                                    return "Valor apostado não pode ser 0.";
+                                    return "Valor não pode ser 0.";
+                                  } else if (_valueCtr.text == "") {
+                                    return "Insira um valor.";
                                   }
                                 },
                                 style: TextStyle(fontSize: 20),

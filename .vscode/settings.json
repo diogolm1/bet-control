@@ -1,12 +1,14 @@
 {
     "cSpell.language": "en,pt",
     "cSpell.words": [
+        "betcontrol",
         "gridline",
         "gridline renderer spec",
         "patua",
         "renderer",
         "rgbo",
         "rxdart",
-        "spec"
+        "spec",
+        "sqflite"
     ]
 }

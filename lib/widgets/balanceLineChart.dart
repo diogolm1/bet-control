@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:learning/models/balancePerDay.dart';
+import 'package:betcontrol/models/balancePerDay.dart';
 
 class BalanceLineChart extends StatefulWidget {
   @override

@@ -1,5 +1,5 @@
-import 'package:learning/database/tables/balanceTable.dart';
-import 'package:learning/database/tables/betTable.dart';
+import 'package:betcontrol/database/tables/balanceTable.dart';
+import 'package:betcontrol/database/tables/betTable.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 

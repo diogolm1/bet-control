@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:learning/models/balance.dart';
-import 'package:learning/models/balancePerDay.dart';
-import 'package:learning/models/bet.dart';
-import 'package:learning/repositories/balanceRepository.dart';
-import 'package:learning/repositories/betRepository.dart';
-import 'package:learning/views/betPage.dart';
-import 'package:learning/widgets/balanceLineChart.dart';
+import 'package:betcontrol/models/balance.dart';
+import 'package:betcontrol/models/balancePerDay.dart';
+import 'package:betcontrol/models/bet.dart';
+import 'package:betcontrol/repositories/balanceRepository.dart';
+import 'package:betcontrol/repositories/betRepository.dart';
+import 'package:betcontrol/views/betPage.dart';
+import 'package:betcontrol/widgets/balanceLineChart.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:learning/widgets/table.dart';
+import 'package:betcontrol/widgets/table.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -220,7 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   }),
               items: [
                 Padding(
-                    padding: EdgeInsets.only(top: 60),
+                    padding: EdgeInsets.only(top: 45),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -256,29 +256,43 @@ class _MyHomePageState extends State<MyHomePage> {
                                       onTap: () {
                                         createAlertDialog(context);
                                       },
-                                      child: Row(
+                                      child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Text(
-                                              "Banca atual: R\$ ${formatCurrency.format(snapshot.data.balance)}",
-                                              style: GoogleFonts.patuaOne(
+                                          const Text("Banca atual:",
+                                              style: TextStyle(
+                                                  // fontFamily: 'PatuaOne',
                                                   fontSize: 30,
-                                                  fontWeight: FontWeight.w500)),
-                                          Container(
-                                            margin: EdgeInsets.only(left: 5),
-                                            child: Icon(
-                                              Icons.edit,
-                                              size: 17,
-                                              color: Colors.white,
-                                            ),
+                                                  fontWeight: FontWeight.w900)),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                  "R\$ ${formatCurrency.format(snapshot.data.balance)}",
+                                                  style: TextStyle(
+                                                      // fontFamily: 'PatuaOne',
+                                                      fontSize: 30,
+                                                      fontWeight:
+                                                          FontWeight.w900)),
+                                              Container(
+                                                margin:
+                                                    EdgeInsets.only(left: 5),
+                                                child: Icon(
+                                                  Icons.edit,
+                                                  size: 17,
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                            ],
                                           )
                                         ],
                                       ),
                                     )),
                                     Container(
                                         margin: EdgeInsets.only(
-                                            top: 15, bottom: 30),
+                                            top: 10, bottom: 30),
                                         child: StreamBuilder(
                                             stream: balancesPerDayStream.stream,
                                             builder: (context, snapshot) {
@@ -442,7 +456,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           child: Column(
                                                             crossAxisAlignment:
                                                                 CrossAxisAlignment
-                                                                    .end,
+                                                                    .center,
                                                             children: [
                                                               Text(
                                                                 "${(snapshot.data.dayProfit + snapshot.data.dayLoss) >= 0 ? "+ " + formatCurrency.format(snapshot.data.dayProfit + snapshot.data.dayLoss) : "- " + formatCurrency.format((snapshot.data.dayProfit + snapshot.data.dayLoss).abs())} ",
@@ -470,7 +484,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                   growthRate,
                                                                   textAlign:
                                                                       TextAlign
-                                                                          .end,
+                                                                          .center,
                                                                   style: TextStyle(
                                                                       color: ((snapshot.data.dayProfit + snapshot.data.dayLoss) >= 0
                                                                           ? Colors

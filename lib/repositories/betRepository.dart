@@ -1,8 +1,8 @@
 import 'package:intl/intl.dart';
-import 'package:learning/database/database.dart';
-import 'package:learning/database/tables/betTable.dart';
-import 'package:learning/models/bet.dart';
-import 'package:learning/repositories/balanceRepository.dart';
+import 'package:betcontrol/database/database.dart';
+import 'package:betcontrol/database/tables/betTable.dart';
+import 'package:betcontrol/models/bet.dart';
+import 'package:betcontrol/repositories/balanceRepository.dart';
 
 class BetRepository {
   static final BetRepository instance = BetRepository.internal();

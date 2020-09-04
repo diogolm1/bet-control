@@ -1,8 +1,8 @@
 import 'package:intl/intl.dart';
-import 'package:learning/database/database.dart';
-import 'package:learning/database/tables/balanceTable.dart';
-import 'package:learning/models/balance.dart';
-import 'package:learning/models/balancePerDay.dart';
+import 'package:betcontrol/database/database.dart';
+import 'package:betcontrol/database/tables/balanceTable.dart';
+import 'package:betcontrol/models/balance.dart';
+import 'package:betcontrol/models/balancePerDay.dart';
 
 class BalanceRepository {
   static final BalanceRepository instance = BalanceRepository.internal();

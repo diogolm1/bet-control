@@ -1,5 +1,5 @@
 import 'package:intl/intl.dart';
-import 'package:learning/database/tables/betTable.dart';
+import 'package:betcontrol/database/tables/betTable.dart';
 
 class Bet {
   int id;
