@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'package:betcontrol/widgets/balanceInfo.dart';
+import 'package:betcontrol/widgets/dailyResults.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:betcontrol/models/balance.dart';
 import 'package:betcontrol/models/balancePerDay.dart';
@@ -69,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
     await getBalance();
   }
 
-  createAlertDialog(BuildContext context) async {
+  editBalanceDialog(BuildContext context) async {
     _editBalanceCtr.updateValue(balance.balance);
     return showDialog(
         context: context,
@@ -230,7 +231,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               case ConnectionState.none:
                               case ConnectionState.waiting:
                                 return Center(
-                                  child: Text("Carregando dados..."),
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(149, 242, 56, 1)),
+                                  ),
                                 );
                               default:
                                 if (snapshot.hasError) {
@@ -238,49 +241,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: Text("Erro ao carregar dados."),
                                   );
                                 } else {
-                                  if (snapshot.data.growthRate > 0) {
-                                    growthRate = "+ ${formatCurrency.format(snapshot.data.growthRate * 100)}%";
-                                  } else if (snapshot.data.growthRate < 0) {
-                                    growthRate = "- ${formatCurrency.format(snapshot.data.growthRate.abs() * 100)}%";
-                                  } else {
-                                    growthRate = "";
-                                  }
                                   return Expanded(
                                       child: Column(children: [
-                                    Container(
-                                        child: GestureDetector(
-                                      onTap: () {
-                                        createAlertDialog(context);
-                                      },
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const Text("Banca atual:",
-                                              style: TextStyle(
-                                                  // fontFamily: 'PatuaOne',
-                                                  fontSize: 30,
-                                                  fontWeight: FontWeight.w900)),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Text("R\$ ${formatCurrency.format(snapshot.data.balance)}",
-                                                  style: TextStyle(
-                                                      // fontFamily: 'PatuaOne',
-                                                      fontSize: 30,
-                                                      fontWeight: FontWeight.w900)),
-                                              Container(
-                                                margin: EdgeInsets.only(left: 5),
-                                                child: Icon(
-                                                  Icons.edit,
-                                                  size: 17,
-                                                  color: Colors.white,
-                                                ),
-                                              )
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    )),
+                                    BalanceInfo(
+                                      balance: snapshot.data.balance,
+                                      editBalance: editBalanceDialog,
+                                      formatCurrency: formatCurrency,
+                                    ),
                                     Container(
                                         margin: EdgeInsets.only(top: 10, bottom: 30),
                                         child: StreamBuilder(
@@ -292,7 +259,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   return SizedBox(
                                                       height: 250,
                                                       child: Center(
-                                                        child: Text("Carregando dados..."),
+                                                        child: CircularProgressIndicator(
+                                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                                              Color.fromRGBO(149, 242, 56, 1)),
+                                                        ),
                                                       ));
                                                 default:
                                                   if (snapshot.hasError) {
@@ -305,124 +275,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                               }
                                             })),
                                     Expanded(
-                                        child: Container(
-                                            decoration: BoxDecoration(color: Color.fromRGBO(75, 201, 134, 1)),
-                                            child: Padding(
-                                                padding: EdgeInsets.fromLTRB(10, 10, 10, 20),
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                  children: [
-                                                    Text(
-                                                      "Diário",
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900),
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      children: [
-                                                        Container(
-                                                            margin: EdgeInsets.only(right: 15),
-                                                            child: Column(
-                                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                                              children: [
-                                                                Container(
-                                                                  margin: EdgeInsets.only(bottom: 5),
-                                                                  child: Text(
-                                                                    "Ganhos",
-                                                                    textAlign: TextAlign.center,
-                                                                    style: TextStyle(
-                                                                        fontSize: 23,
-                                                                        color: Colors.black,
-                                                                        fontWeight: FontWeight.w600),
-                                                                  ),
-                                                                ),
-                                                                Text(
-                                                                  "+ ${formatCurrency.format(snapshot.data.dayProfit)}",
-                                                                  textAlign: TextAlign.center,
-                                                                  style: TextStyle(
-                                                                      fontSize: 20, fontWeight: FontWeight.w500),
-                                                                ),
-                                                              ],
-                                                            )),
-                                                        Container(
-                                                            margin: EdgeInsets.only(left: 15),
-                                                            child: Column(
-                                                              children: [
-                                                                Container(
-                                                                  margin: EdgeInsets.only(bottom: 5),
-                                                                  child: Text(
-                                                                    "Perdas",
-                                                                    textAlign: TextAlign.center,
-                                                                    style: TextStyle(
-                                                                        fontSize: 23,
-                                                                        color: Colors.black,
-                                                                        fontWeight: FontWeight.w600),
-                                                                  ),
-                                                                ),
-                                                                Text(
-                                                                  "- ${formatCurrency.format(snapshot.data.dayLoss.abs())}",
-                                                                  textAlign: TextAlign.center,
-                                                                  style: TextStyle(
-                                                                      fontSize: 20,
-                                                                      color: Colors.red,
-                                                                      fontWeight: FontWeight.w500),
-                                                                ),
-                                                              ],
-                                                            )),
-                                                      ],
-                                                    ),
-                                                    Column(
-                                                      children: [
-                                                        Container(
-                                                          margin: EdgeInsets.only(bottom: 5),
-                                                          child: Text(
-                                                            "Resultado",
-                                                            textAlign: TextAlign.center,
-                                                            style: TextStyle(
-                                                                fontSize: 23,
-                                                                color: Colors.black,
-                                                                fontWeight: FontWeight.w600),
-                                                          ),
-                                                        ),
-                                                        Container(
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                                            children: [
-                                                              Text(
-                                                                "${(snapshot.data.dayProfit + snapshot.data.dayLoss) >= 0 ? "+ " + formatCurrency.format(snapshot.data.dayProfit + snapshot.data.dayLoss) : "- " + formatCurrency.format((snapshot.data.dayProfit + snapshot.data.dayLoss).abs())} ",
-                                                                textAlign: TextAlign.start,
-                                                                style: TextStyle(
-                                                                    color: ((snapshot.data.dayProfit +
-                                                                                snapshot.data.dayLoss) >=
-                                                                            0
-                                                                        ? Colors.white
-                                                                        : Colors.red),
-                                                                    fontSize: 20,
-                                                                    fontWeight: FontWeight.w500),
-                                                              ),
-                                                              Container(
-                                                                margin: EdgeInsets.only(top: 5),
-                                                                child: Text(
-                                                                  growthRate,
-                                                                  textAlign: TextAlign.center,
-                                                                  style: TextStyle(
-                                                                      color: ((snapshot.data.dayProfit +
-                                                                                  snapshot.data.dayLoss) >=
-                                                                              0
-                                                                          ? Colors.white
-                                                                          : Colors.red),
-                                                                      fontSize: 15,
-                                                                      fontWeight: FontWeight.w500),
-                                                                ),
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                )))),
+                                        child: DailyResults(
+                                      balance: snapshot.data,
+                                      formatCurrency: formatCurrency,
+                                    )),
                                   ]));
                                 }
                             }
