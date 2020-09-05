@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future _editBalance() async {
     await BalanceRepository.instance.updateBalance(_editBalanceCtr.numberValue);
-    await getBalance();
+    refreshValues();
   }
 
   editBalanceDialog(BuildContext context) async {
