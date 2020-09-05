@@ -8,6 +8,7 @@ class BetTable extends StatelessWidget {
   final showOptions showTableOptions;
   final List<Bet> bets;
   final formatCurrency = NumberFormat("#,##0.00", "pt");
+  final dateFormat = DateFormat("dd/MM/yyyy");
 
   BetTable({this.bets, this.showTableOptions});
 
@@ -22,6 +23,7 @@ class BetTable extends StatelessWidget {
             style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
           ),
         ),
+        Text(dateFormat.format(DateTime.now().toLocal())),
         Expanded(
             child: Container(
           decoration: BoxDecoration(color: Color.fromRGBO(75, 201, 134, 1)),
