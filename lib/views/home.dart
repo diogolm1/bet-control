@@ -202,140 +202,142 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromRGBO(53, 51, 51, 1),
-      body: Column(children: [
-        Builder(
-          builder: (context) {
-            final height = MediaQuery.of(context).size.height;
-            return CarouselSlider(
-              options: CarouselOptions(
-                  height: height - 35,
-                  viewportFraction: 1.0,
-                  enlargeCenterPage: false,
-                  enableInfiniteScroll: false,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _currentPage = index;
-                    });
-                  }),
-              items: [
-                Padding(
-                    padding: EdgeInsets.only(top: 45),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        StreamBuilder(
-                          stream: balanceStream.stream,
-                          builder: (context, snapshot) {
-                            switch (snapshot.connectionState) {
-                              case ConnectionState.none:
-                              case ConnectionState.waiting:
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(149, 242, 56, 1)),
-                                  ),
-                                );
-                              default:
-                                if (snapshot.hasError) {
+      body: SingleChildScrollView(
+        child: Column(children: [
+          Builder(
+            builder: (context) {
+              final height = MediaQuery.of(context).size.height;
+              return CarouselSlider(
+                options: CarouselOptions(
+                    height: height - 35,
+                    viewportFraction: 1.0,
+                    enlargeCenterPage: false,
+                    enableInfiniteScroll: false,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _currentPage = index;
+                      });
+                    }),
+                items: [
+                  Padding(
+                      padding: EdgeInsets.only(top: 45),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          StreamBuilder(
+                            stream: balanceStream.stream,
+                            builder: (context, snapshot) {
+                              switch (snapshot.connectionState) {
+                                case ConnectionState.none:
+                                case ConnectionState.waiting:
                                   return Center(
-                                    child: Text("Erro ao carregar dados."),
-                                  );
-                                } else {
-                                  return Expanded(
-                                      child: Column(children: [
-                                    BalanceInfo(
-                                      balance: snapshot.data.balance,
-                                      editBalance: editBalanceDialog,
-                                      formatCurrency: formatCurrency,
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(149, 242, 56, 1)),
                                     ),
-                                    Container(
-                                        margin: EdgeInsets.only(top: 10, bottom: 30),
-                                        child: StreamBuilder(
-                                            stream: balancesPerDayStream.stream,
-                                            builder: (context, snapshot) {
-                                              switch (snapshot.connectionState) {
-                                                case ConnectionState.none:
-                                                case ConnectionState.waiting:
-                                                  return SizedBox(
-                                                      height: 250,
-                                                      child: Center(
-                                                        child: CircularProgressIndicator(
-                                                          valueColor: AlwaysStoppedAnimation<Color>(
-                                                              Color.fromRGBO(149, 242, 56, 1)),
-                                                        ),
-                                                      ));
-                                                default:
-                                                  if (snapshot.hasError) {
-                                                    return Center(
-                                                      child: Text("Erro ao carregar dados."),
-                                                    );
-                                                  } else {
-                                                    return BalanceLineChart(snapshot.data);
-                                                  }
-                                              }
-                                            })),
-                                    Expanded(
-                                        child: DailyResults(
-                                      balance: snapshot.data,
-                                      formatCurrency: formatCurrency,
-                                    )),
-                                  ]));
-                                }
-                            }
-                          },
-                        ),
-                      ],
-                    )),
-                StreamBuilder(
-                    stream: betsStream.stream,
-                    builder: (context, snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.none:
-                        case ConnectionState.waiting:
-                          return Center(
-                            child: Text("Carregando dados..."),
-                          );
-                        default:
-                          if (snapshot.hasError) {
+                                  );
+                                default:
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text("Erro ao carregar dados."),
+                                    );
+                                  } else {
+                                    return Expanded(
+                                        child: Column(children: [
+                                      BalanceInfo(
+                                        balance: snapshot.data.balance,
+                                        editBalance: editBalanceDialog,
+                                        formatCurrency: formatCurrency,
+                                      ),
+                                      Container(
+                                          margin: EdgeInsets.only(top: 10, bottom: 30),
+                                          child: StreamBuilder(
+                                              stream: balancesPerDayStream.stream,
+                                              builder: (context, snapshot) {
+                                                switch (snapshot.connectionState) {
+                                                  case ConnectionState.none:
+                                                  case ConnectionState.waiting:
+                                                    return SizedBox(
+                                                        height: 250,
+                                                        child: Center(
+                                                          child: CircularProgressIndicator(
+                                                            valueColor: AlwaysStoppedAnimation<Color>(
+                                                                Color.fromRGBO(149, 242, 56, 1)),
+                                                          ),
+                                                        ));
+                                                  default:
+                                                    if (snapshot.hasError) {
+                                                      return Center(
+                                                        child: Text("Erro ao carregar dados."),
+                                                      );
+                                                    } else {
+                                                      return BalanceLineChart(snapshot.data);
+                                                    }
+                                                }
+                                              })),
+                                      Expanded(
+                                          child: DailyResults(
+                                        balance: snapshot.data,
+                                        formatCurrency: formatCurrency,
+                                      )),
+                                    ]));
+                                  }
+                              }
+                            },
+                          ),
+                        ],
+                      )),
+                  StreamBuilder(
+                      stream: betsStream.stream,
+                      builder: (context, snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.none:
+                          case ConnectionState.waiting:
                             return Center(
-                              child: Text("Erro ao carregar dados"),
+                              child: Text("Carregando dados..."),
                             );
-                          } else {
-                            return BetTable(
-                              bets: snapshot.data,
-                              showTableOptions: showOptions,
-                            );
-                          }
-                      }
-                    })
-              ],
-            );
-          },
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: _currentPage == 0 ? 12.0 : 8.0,
-              height: _currentPage == 0 ? 12.0 : 8.0,
-              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _currentPage == 0 ? Color.fromRGBO(149, 242, 56, 1) : Colors.grey,
+                          default:
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Text("Erro ao carregar dados"),
+                              );
+                            } else {
+                              return BetTable(
+                                bets: snapshot.data,
+                                showTableOptions: showOptions,
+                              );
+                            }
+                        }
+                      })
+                ],
+              );
+            },
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: _currentPage == 0 ? 12.0 : 8.0,
+                height: _currentPage == 0 ? 12.0 : 8.0,
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _currentPage == 0 ? Color.fromRGBO(149, 242, 56, 1) : Colors.grey,
+                ),
               ),
-            ),
-            Container(
-              width: _currentPage == 1 ? 12.0 : 8.0,
-              height: _currentPage == 1 ? 12.0 : 8.0,
-              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _currentPage == 1 ? Color.fromRGBO(149, 242, 56, 1) : Colors.grey,
-              ),
-            )
-          ],
-        )
-      ]),
+              Container(
+                width: _currentPage == 1 ? 12.0 : 8.0,
+                height: _currentPage == 1 ? 12.0 : 8.0,
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _currentPage == 1 ? Color.fromRGBO(149, 242, 56, 1) : Colors.grey,
+                ),
+              )
+            ],
+          )
+        ]),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showDialogBet,
         backgroundColor: Color.fromRGBO(149, 242, 56, 1),

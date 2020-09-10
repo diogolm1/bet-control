@@ -92,7 +92,7 @@ class DailyResults extends StatelessWidget {
                           Container(
                             margin: EdgeInsets.only(top: 5),
                             child: Text(
-                              "${balance.growthRate >= 0 ? "+ " + formatCurrency.format(balance.growthRate * 100) + "%" : (balance.growthRate < 0) ? "- " + formatCurrency.format(balance.growthRate.abs() * 100) + "%" : ""}",
+                              "${balance.growthRate > 0 ? "+ " + formatCurrency.format(balance.growthRate * 100) + "%" : (balance.growthRate < 0) ? "- " + formatCurrency.format(balance.growthRate.abs() * 100) + "%" : ""}",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: ((balance.dayProfit + balance.dayLoss) >= 0 ? Colors.white : Colors.red),
