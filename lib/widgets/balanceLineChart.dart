@@ -70,7 +70,7 @@ class _BalanceLineChartState extends State<BalanceLineChart> {
     var chartWidget = new Padding(
       padding: new EdgeInsets.all(10),
       child: new SizedBox(
-        height: 250,
+        height: MediaQuery.of(context).size.height * 0.35,
         child: chart,
       ),
     );

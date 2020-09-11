@@ -185,6 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
           insetPadding: EdgeInsets.fromLTRB(15, 30, 10, 10),
           child: BetPage(
             bet: bet,
+            balance: balance.balance,
           ),
         ));
 

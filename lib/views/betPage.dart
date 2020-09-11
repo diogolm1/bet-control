@@ -7,8 +7,9 @@ import 'package:betcontrol/models/bet.dart';
 
 class BetPage extends StatefulWidget {
   final Bet bet;
+  final double balance;
 
-  BetPage({this.bet});
+  BetPage({this.bet, this.balance});
 
   @override
   _BetPageState createState() => _BetPageState();
@@ -142,15 +143,18 @@ class _BetPageState extends State<BetPage> {
                               margin: EdgeInsets.only(right: 7),
                               child: TextFormField(
                                 controller: _valueCtr,
-                                validator: (value) {
+                                validator: (_) {
                                   if (_valueCtr.numberValue == 0) {
                                     return "Valor não pode ser 0.";
+                                  } else if (_valueCtr.numberValue > widget.balance) {
+                                    return "Valor não pode ser maior que a banca.";
                                   } else if (_valueCtr.text == "") {
                                     return "Insira um valor.";
                                   }
                                 },
                                 style: TextStyle(fontSize: 20),
                                 decoration: InputDecoration(
+                                  errorMaxLines: 2,
                                   labelText: "Valor",
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
