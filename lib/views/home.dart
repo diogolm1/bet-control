@@ -30,6 +30,7 @@ class _MyHomePageState extends State<MyHomePage> {
   StreamController<List<BalancePerDay>> balancesPerDayStream = BehaviorSubject<List<BalancePerDay>>();
   StreamController<List<Bet>> betsStream = new BehaviorSubject<List<Bet>>();
   String growthRate = "";
+  DateTime betsDate = new DateTime.now();
 
   Balance balance;
 
@@ -51,8 +52,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return b;
   }
 
-  Future<List<Bet>> getBets() async {
-    var bets = await BetRepository.instance.getAll();
+  Future<List<Bet>> getBets({date}) async {
+    if (date != null) {
+      setState(() {
+        betsDate = date;
+      });
+    }
+
+    var bets = await BetRepository.instance.getByDate(betsDate);
     betsStream.add(bets);
     return bets;
   }
@@ -306,6 +313,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               return BetTable(
                                 bets: snapshot.data,
                                 showTableOptions: showOptions,
+                                getBetsByDate: getBets,
+                                betsDate: betsDate,
                               );
                             }
                         }

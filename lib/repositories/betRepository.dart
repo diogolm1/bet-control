@@ -34,6 +34,14 @@ class BetRepository {
     return list;
   }
 
+  Future<List<Bet>> getByDate(DateTime date) async {
+    final db = await DatabaseHelper.instance.database;
+    var dateString = DateFormat('yyyy-MM-dd').format(date);
+    var results = await db.query(BetTable.name, where: '${BetTable.columnDate} = ?', whereArgs: [dateString]);
+
+    return results.map((e) => Bet.fromMap(e)).toList();
+  }
+
   Future<Bet> getById(int id) async {
     final db = await DatabaseHelper.instance.database;
     var result = await db.query(BetTable.name,
